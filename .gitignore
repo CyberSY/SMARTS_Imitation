@@ -127,3 +127,12 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+.vscode
+_run_logs
+results
+supervisord.log
+supervisord.pid
+xdummy.log
+xdummy.log.old
+xorg.sh
