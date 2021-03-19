@@ -1,0 +1,402 @@
+[2755922.696] 
+X.Org X Server 1.18.4
+Release Date: 2016-07-19
+[2755922.696] X Protocol Version 11, Revision 0
+[2755922.696] Build Operating System: Linux 4.15.0-124-generic x86_64 Ubuntu
+[2755922.696] Current Operating System: Linux gpu20-zbzhu 4.4.0-131-generic #157-Ubuntu SMP Thu Jul 12 15:51:36 UTC 2018 x86_64
+[2755922.696] Kernel command line: BOOT_IMAGE=/boot/vmlinuz-4.4.0-131-generic root=UUID=a2aa08eb-3351-49ed-99f2-9d26c398045a ro
+[2755922.696] Build Date: 30 November 2020  08:02:24PM
+[2755922.696] xorg-server 2:1.18.4-0ubuntu0.11 (For technical support please see http://www.ubuntu.com/support) 
+[2755922.696] Current version of pixman: 0.33.6
+[2755922.696] 	Before reporting problems, check http://wiki.x.org
+	to make sure that you have the latest version.
+[2755922.696] Markers: (--) probed, (**) from config file, (==) default setting,
+	(++) from command line, (!!) notice, (II) informational,
+	(WW) warning, (EE) error, (NI) not implemented, (??) unknown.
+[2755922.697] (++) Log file: "./xdummy.log", Time: Fri Mar 19 04:43:42 2021
+[2755922.697] (++) Using config file: "/etc/X11/xorg.conf"
+[2755922.697] (==) Using system config directory "/usr/share/X11/xorg.conf.d"
+[2755922.698] (==) ServerLayout "dummy_layout"
+[2755922.698] (**) |-->Screen "dummy_screen" (0)
+[2755922.698] (**) |   |-->Monitor "dummy_monitor"
+[2755922.698] (**) |   |-->Device "dummy_videocard"
+[2755922.699] (**) |   |-->GPUDevice "dummy_videocard"
+[2755922.699] (**) |-->Input Device "dummy_mouse"
+[2755922.699] (**) |-->Input Device "dummy_keyboard"
+[2755922.699] (**) Option "DontVTSwitch" "true"
+[2755922.699] (**) Option "AllowMouseOpenFail" "true"
+[2755922.699] (**) Option "AutoAddDevices" "false"
+[2755922.699] (**) Option "AutoEnableDevices" "false"
+[2755922.699] (**) Not automatically adding devices
+[2755922.699] (**) Not automatically enabling devices
+[2755922.699] (==) Automatically adding GPU devices
+[2755922.699] (==) Max clients allowed: 256, resource mask: 0x1fffff
+[2755922.699] (WW) The directory "/usr/share/fonts/X11/cyrillic" does not exist.
+[2755922.699] 	Entry deleted from font path.
+[2755922.699] (WW) The directory "/usr/share/fonts/X11/100dpi/" does not exist.
+[2755922.699] 	Entry deleted from font path.
+[2755922.699] (WW) The directory "/usr/share/fonts/X11/75dpi/" does not exist.
+[2755922.699] 	Entry deleted from font path.
+[2755922.699] (WW) The directory "/usr/share/fonts/X11/Type1" does not exist.
+[2755922.699] 	Entry deleted from font path.
+[2755922.699] (WW) The directory "/usr/share/fonts/X11/100dpi" does not exist.
+[2755922.699] 	Entry deleted from font path.
+[2755922.699] (WW) The directory "/usr/share/fonts/X11/75dpi" does not exist.
+[2755922.699] 	Entry deleted from font path.
+[2755922.699] (==) FontPath set to:
+	/usr/share/fonts/X11/misc,
+	built-ins
+[2755922.699] (==) ModulePath set to "/usr/lib/x86_64-linux-gnu/xorg/extra-modules,/usr/lib/xorg/extra-modules,/usr/lib/xorg/modules"
+[2755922.699] (II) Loader magic: 0x55a02965fdc0
+[2755922.699] (II) Module ABI versions:
+[2755922.699] 	X.Org ANSI C Emulation: 0.4
+[2755922.699] 	X.Org Video Driver: 20.0
+[2755922.699] 	X.Org XInput driver : 22.1
+[2755922.699] 	X.Org Server Extension : 9.0
+[2755922.782] (EE) systemd-logind: failed to get session: PID 3737 does not belong to any known session
+[2755922.782] (II) xfree86: Adding drm device (/dev/dri/card0)
+[2755922.783] (II) config/udev: Ignoring already known drm device (/dev/dri/card0)
+[2755922.794] (--) PCI:*(0:129:0:0) 10de:1b06:1458:374c rev 161, Mem @ 0xfa000000/16777216, 0xe0000000/268435456, 0xf0000000/33554432, I/O @ 0x0000f000/128, BIOS @ 0x????????/524288
+[2755922.794] (II) LoadModule: "glx"
+[2755922.794] (II) Loading /usr/lib/xorg/modules/extensions/libglx.so
+[2755922.796] (II) Module glx: vendor="X.Org Foundation"
+[2755922.796] 	compiled for 1.18.4, module version = 1.0.0
+[2755922.796] 	ABI class: X.Org Server Extension, version 9.0
+[2755922.796] (==) AIGLX enabled
+[2755922.796] (II) LoadModule: "dummy"
+[2755922.796] (II) Loading /usr/lib/xorg/modules/drivers/dummy_drv.so
+[2755922.796] (II) Module dummy: vendor="X.Org Foundation"
+[2755922.796] 	compiled for 1.18.1, module version = 0.3.7
+[2755922.796] 	Module class: X.Org Video Driver
+[2755922.796] 	ABI class: X.Org Video Driver, version 20.0
+[2755922.796] (II) LoadModule: "void"
+[2755922.796] (WW) Warning, couldn't open module void
+[2755922.796] (II) UnloadModule: "void"
+[2755922.796] (II) Unloading void
+[2755922.796] (EE) Failed to load module "void" (module does not exist, 0)
+[2755922.796] (II) DUMMY: Driver for Dummy chipsets: dummy
+[2755922.796] (WW) Falling back to old probe method for dummy
+[2755922.796] (WW) VGA arbiter: cannot open kernel arbiter, no multi-card support
+[2755922.796] (EE) Screen 1 deleted because of no matching config section.
+[2755922.796] (II) UnloadModule: "dummy"
+[2755922.796] (II) DUMMY(0): Chipset is a DUMMY
+[2755922.796] (**) DUMMY(0): Depth 24, (--) framebuffer bpp 32
+[2755922.796] (==) DUMMY(0): RGB weight 888
+[2755922.796] (==) DUMMY(0): Default visual is TrueColor
+[2755922.797] (==) DUMMY(0): Using gamma correction (1.0, 1.0, 1.0)
+[2755922.797] (**) DUMMY(0): VideoRAM: 192000 kByte
+[2755922.797] (--) DUMMY(0): Max Clock: 230000 kHz
+[2755922.797] (II) DUMMY(0): dummy_monitor: Using hsync range of 5.00-1000.00 kHz
+[2755922.797] (II) DUMMY(0): dummy_monitor: Using vrefresh range of 5.00-200.00 Hz
+[2755922.797] (II) DUMMY(0): Clock range:  11.00 to 300.00 MHz
+[2755922.797] (II) DUMMY(0): Not using mode "32768x32768" (insufficient memory for mode)
+[2755922.797] (II) DUMMY(0): Not using mode "32768x16384" (insufficient memory for mode)
+[2755922.797] (II) DUMMY(0): Not using mode "16384x8192" (insufficient memory for mode)
+[2755922.797] (II) DUMMY(0): Not using mode "8192x4096" (bad mode clock/interlace/doublescan)
+[2755922.799] (**) DUMMY(0): Virtual size is 8192x4096 (pitch 8192)
+[2755922.799] (**) DUMMY(0): *Mode "5120x3200": 199.8 MHz, 33.7 kHz, 10.0 Hz
+[2755922.799] (II) DUMMY(0): Modeline "5120x3200"x10.0  199.75  5120 5152 5904 5936  3200 3277 3283 3361 (33.7 kHz z)
+[2755922.799] (**) DUMMY(0): *Mode "3840x2880": 133.4 MHz, 30.3 kHz, 10.0 Hz
+[2755922.799] (II) DUMMY(0): Modeline "3840x2880"x10.0  133.43  3840 3872 4376 4408  2880 2950 2955 3025 (30.3 kHz z)
+[2755922.799] (**) DUMMY(0): *Mode "3840x2560": 116.9 MHz, 26.9 kHz, 10.0 Hz
+[2755922.799] (II) DUMMY(0): Modeline "3840x2560"x10.0  116.93  3840 3872 4312 4344  2560 2622 2627 2689 (26.9 kHz z)
+[2755922.799] (**) DUMMY(0): *Mode "3840x2048": 91.5 MHz, 21.5 kHz, 10.0 Hz
+[2755922.799] (II) DUMMY(0): Modeline "3840x2048"x10.0   91.45  3840 3872 4216 4248  2048 2097 2101 2151 (21.5 kHz z)
+[2755922.799] (**) DUMMY(0): *Mode "2048x2048": 49.5 MHz, 21.5 kHz, 10.0 Hz
+[2755922.799] (II) DUMMY(0): Modeline "2048x2048"x10.0   49.47  2048 2080 2264 2296  2048 2097 2101 2151 (21.5 kHz z)
+[2755922.799] (**) DUMMY(0): *Mode "2560x1600": 47.1 MHz, 16.8 kHz, 10.0 Hz
+[2755922.799] (II) DUMMY(0): Modeline "2560x1600"x10.0   47.12  2560 2592 2768 2800  1600 1639 1642 1681 (16.8 kHz z)
+[2755922.800] (**) DUMMY(0): *Mode "1920x1440": 69.5 MHz, 29.1 kHz, 20.0 Hz
+[2755922.800] (II) DUMMY(0): Modeline "1920x1440"x20.0   69.47  1920 1960 2152 2384  1440 1441 1444 1457 (29.1 kHz z)
+[2755922.800] (**) DUMMY(0): *Mode "1920x1200": 26.3 MHz, 12.6 kHz, 10.0 Hz
+[2755922.800] (II) DUMMY(0): Modeline "1920x1200"x10.0   26.28  1920 1952 2048 2080  1200 1229 1231 1261 (12.6 kHz z)
+[2755922.800] (**) DUMMY(0): *Mode "1920x1080": 23.5 MHz, 11.4 kHz, 10.0 Hz
+[2755922.800] (II) DUMMY(0): Modeline "1920x1080"x10.0   23.53  1920 1952 2040 2072  1080 1106 1108 1135 (11.4 kHz z)
+[2755922.800] (**) DUMMY(0): *Mode "1600x1200": 22.0 MHz, 12.6 kHz, 10.0 Hz
+[2755922.800] (II) DUMMY(0): Modeline "1600x1200"x10.0   22.04  1600 1632 1712 1744  1200 1229 1231 1261 (12.6 kHz z)
+[2755922.800] (**) DUMMY(0): *Mode "1680x1050": 20.1 MHz, 11.1 kHz, 10.0 Hz
+[2755922.800] (II) DUMMY(0): Modeline "1680x1050"x10.0   20.08  1680 1712 1784 1816  1050 1075 1077 1103 (11.1 kHz z)
+[2755922.800] (**) DUMMY(0): *Mode "1600x900": 33.9 MHz, 18.9 kHz, 20.0 Hz
+[2755922.800] (II) DUMMY(0): Modeline "1600x900"x20.0   33.92  1600 1632 1760 1792  900 921 924 946 (18.9 kHz z)
+[2755922.800] (**) DUMMY(0): *Default mode "1400x1050": 179.3 MHz, 93.8 kHz, 85.0 Hz
+[2755922.800] (II) DUMMY(0): Modeline "1400x1050"x85.0  179.26  1400 1504 1656 1912  1050 1051 1054 1103 -hsync +vsync (93.8 kHz zd)
+[2755922.800] (**) DUMMY(0): *Mode "1440x900": 30.7 MHz, 19.0 kHz, 20.1 Hz
+[2755922.800] (II) DUMMY(0): Modeline "1440x900"x20.1   30.66  1440 1472 1584 1616  900 921 924 946 (19.0 kHz z)
+[2755922.800] (**) DUMMY(0): *Mode "1280x1024": 31.5 MHz, 21.6 kHz, 20.1 Hz
+[2755922.800] (II) DUMMY(0): Modeline "1280x1024"x20.1   31.50  1280 1312 1424 1456  1024 1048 1052 1076 (21.6 kHz z)
+[2755922.800] (**) DUMMY(0): *Mode "1366x768": 72.0 MHz, 48.2 kHz, 60.0 Hz
+[2755922.800] (II) DUMMY(0): Modeline "1366x768"x60.0   72.00  1366 1414 1446 1494  768 771 777 803 (48.2 kHz z)
+[2755922.800] (**) DUMMY(0): *Mode "1280x800": 24.1 MHz, 16.9 kHz, 20.1 Hz
+[2755922.800] (II) DUMMY(0): Modeline "1280x800"x20.1   24.15  1280 1312 1400 1432  800 819 822 841 (16.9 kHz z)
+[2755922.800] (**) DUMMY(0): *Mode "1024x768": 23.8 MHz, 20.2 kHz, 25.0 Hz
+[2755922.800] (II) DUMMY(0): Modeline "1024x768"x25.0   23.77  1024 1056 1144 1176  768 785 789 807 (20.2 kHz z)
+[2755922.800] (**) DUMMY(0): *Mode "1024x600": 18.3 MHz, 15.9 kHz, 25.1 Hz
+[2755922.800] (II) DUMMY(0): Modeline "1024x600"x25.1   18.26  1024 1056 1120 1152  600 614 617 631 (15.9 kHz z)
+[2755922.800] (**) DUMMY(0): *Mode "800x600": 14.5 MHz, 15.9 kHz, 25.2 Hz
+[2755922.800] (II) DUMMY(0): Modeline "800x600"x25.2   14.50  800 832 880 912  600 614 617 631 (15.9 kHz z)
+[2755922.800] (**) DUMMY(0): *Default mode "320x200": 15.8 MHz, 37.9 kHz, 85.3 Hz (D)
+[2755922.800] (II) DUMMY(0): Modeline "320x200"x85.3   15.75  320 336 368 416  200 200 202 222 doublescan -hsync +vsync (37.9 kHz zd)
+[2755922.800] (**) DUMMY(0):  Mode "5496x1200": 199.1 MHz, 31.5 kHz, 25.0 Hz
+[2755922.800] (II) DUMMY(0): Modeline "5496x1200"x25.0  199.13  5496 5528 6280 6312  1200 1228 1233 1261 (31.5 kHz)
+[2755922.800] (**) DUMMY(0):  Mode "5280x1200": 191.4 MHz, 31.6 kHz, 25.0 Hz
+[2755922.800] (II) DUMMY(0): Modeline "5280x1200"x25.0  191.40  5280 5312 6032 6064  1200 1228 1233 1261 (31.6 kHz)
+[2755922.800] (**) DUMMY(0):  Mode "4800x1200": 64.4 MHz, 12.6 kHz, 10.0 Hz
+[2755922.800] (II) DUMMY(0): Modeline "4800x1200"x10.0   64.42  4800 4832 5072 5104  1200 1229 1231 1261 (12.6 kHz)
+[2755922.800] (**) DUMMY(0):  Mode "5280x1080": 170.0 MHz, 28.4 kHz, 25.0 Hz
+[2755922.800] (II) DUMMY(0): Modeline "5280x1080"x25.0  169.96  5280 5312 5952 5984  1080 1105 1110 1135 (28.4 kHz)
+[2755922.800] (**) DUMMY(0):  Mode "3600x1200": 106.1 MHz, 24.3 kHz, 20.0 Hz
+[2755922.800] (II) DUMMY(0): Modeline "3600x1200"x20.0  106.06  3600 3632 3984 4368  1200 1201 1204 1214 (24.3 kHz)
+[2755922.800] (**) DUMMY(0):  Mode "3840x1080": 100.4 MHz, 21.9 kHz, 20.0 Hz
+[2755922.800] (II) DUMMY(0): Modeline "3840x1080"x20.0  100.38  3840 3848 4216 4592  1080 1081 1084 1093 (21.9 kHz)
+[2755922.800] (**) DUMMY(0):  Mode "2560x1440": 42.1 MHz, 15.1 kHz, 10.0 Hz
+[2755922.800] (II) DUMMY(0): Modeline "2560x1440"x10.0   42.12  2560 2592 2752 2784  1440 1475 1478 1513 (15.1 kHz)
+[2755922.800] (**) DUMMY(0):  Mode "3288x1080": 39.8 MHz, 11.4 kHz, 10.0 Hz
+[2755922.800] (II) DUMMY(0): Modeline "3288x1080"x10.0   39.76  3288 3320 3464 3496  1080 1106 1108 1135 (11.4 kHz)
+[2755922.800] (**) DUMMY(0):  Mode "2048x1536": 80.1 MHz, 31.1 kHz, 20.0 Hz
+[2755922.800] (II) DUMMY(0): Modeline "2048x1536"x20.0   80.06  2048 2104 2312 2576  1536 1537 1540 1554 (31.1 kHz)
+[2755922.800] (**) DUMMY(0):  Default mode "1856x1392": 288.0 MHz, 112.5 kHz, 75.0 Hz
+[2755922.800] (II) DUMMY(0): Modeline "1856x1392"x75.0  288.00  1856 1984 2208 2560  1392 1393 1396 1500 -hsync +vsync (112.5 kHz d)
+[2755922.800] (**) DUMMY(0):  Default mode "1856x1392": 218.3 MHz, 86.4 kHz, 60.0 Hz
+[2755922.800] (II) DUMMY(0): Modeline "1856x1392"x60.0  218.30  1856 1952 2176 2528  1392 1393 1396 1439 -hsync +vsync (86.4 kHz d)
+[2755922.800] (**) DUMMY(0):  Default mode "1792x1344": 261.0 MHz, 106.3 kHz, 75.0 Hz
+[2755922.800] (II) DUMMY(0): Modeline "1792x1344"x75.0  261.00  1792 1888 2104 2456  1344 1345 1348 1417 -hsync +vsync (106.3 kHz d)
+[2755922.800] (**) DUMMY(0):  Default mode "1792x1344": 204.8 MHz, 83.7 kHz, 60.0 Hz
+[2755922.800] (II) DUMMY(0): Modeline "1792x1344"x60.0  204.80  1792 1920 2120 2448  1344 1345 1348 1394 -hsync +vsync (83.7 kHz d)
+[2755922.800] (**) DUMMY(0):  Default mode "1400x1050": 155.8 MHz, 81.5 kHz, 74.8 Hz
+[2755922.800] (II) DUMMY(0): Modeline "1400x1050"x74.8  155.80  1400 1464 1784 1912  1050 1052 1064 1090 +hsync +vsync (81.5 kHz d)
+[2755922.800] (**) DUMMY(0):  Default mode "1400x1050": 145.1 MHz, 76.5 kHz, 70.0 Hz
+[2755922.800] (II) DUMMY(0): Modeline "1400x1050"x70.0  145.06  1400 1496 1648 1896  1050 1051 1054 1093 -hsync +vsync (76.5 kHz d)
+[2755922.800] (**) DUMMY(0):  Default mode "1400x1050": 122.0 MHz, 64.9 kHz, 60.0 Hz
+[2755922.800] (II) DUMMY(0): Modeline "1400x1050"x60.0  122.00  1400 1488 1640 1880  1050 1052 1064 1082 +hsync +vsync (64.9 kHz d)
+[2755922.800] (**) DUMMY(0):  Default mode "1280x960": 148.5 MHz, 85.9 kHz, 85.0 Hz
+[2755922.800] (II) DUMMY(0): Modeline "1280x960"x85.0  148.50  1280 1344 1504 1728  960 961 964 1011 +hsync +vsync (85.9 kHz d)
+[2755922.800] (**) DUMMY(0):  Default mode "1280x960": 108.0 MHz, 60.0 kHz, 60.0 Hz
+[2755922.800] (II) DUMMY(0): Modeline "1280x960"x60.0  108.00  1280 1376 1488 1800  960 961 964 1000 +hsync +vsync (60.0 kHz d)
+[2755922.800] (**) DUMMY(0):  Mode "1360x768": 24.5 MHz, 16.2 kHz, 20.1 Hz
+[2755922.800] (II) DUMMY(0): Modeline "1360x768"x20.1   24.49  1360 1392 1480 1512  768 786 789 807 (16.2 kHz)
+[2755922.800] (**) DUMMY(0):  Mode "800x1280": 25.9 MHz, 27.0 kHz, 20.1 Hz
+[2755922.800] (II) DUMMY(0): Modeline "800x1280"x20.1   25.89  800 832 928 960  1280 1310 1315 1345 (27.0 kHz)
+[2755922.800] (**) DUMMY(0):  Mode "1280x800": 24.1 MHz, 16.9 kHz, 20.1 Hz
+[2755922.800] (II) DUMMY(0): Modeline "1280x800"x20.1   24.15  1280 1312 1400 1432  800 819 822 841 (16.9 kHz)
+[2755922.800] (**) DUMMY(0):  Default mode "1152x864": 143.5 MHz, 91.5 kHz, 100.0 Hz
+[2755922.800] (II) DUMMY(0): Modeline "1152x864"x100.0  143.47  1152 1232 1360 1568  864 865 868 915 -hsync +vsync (91.5 kHz d)
+[2755922.801] (**) DUMMY(0):  Default mode "1152x864": 121.5 MHz, 77.5 kHz, 85.1 Hz
+[2755922.801] (II) DUMMY(0): Modeline "1152x864"x85.1  121.50  1152 1216 1344 1568  864 865 868 911 +hsync -vsync (77.5 kHz d)
+[2755922.801] (**) DUMMY(0):  Default mode "1152x864": 119.7 MHz, 77.1 kHz, 85.0 Hz
+[2755922.801] (II) DUMMY(0): Modeline "1152x864"x85.0  119.65  1152 1224 1352 1552  864 865 868 907 -hsync +vsync (77.1 kHz d)
+[2755922.801] (**) DUMMY(0):  Default mode "1152x864": 108.0 MHz, 67.5 kHz, 75.0 Hz
+[2755922.801] (II) DUMMY(0): Modeline "1152x864"x75.0  108.00  1152 1216 1344 1600  864 865 868 900 +hsync +vsync (67.5 kHz d)
+[2755922.801] (**) DUMMY(0):  Default mode "1152x864": 105.0 MHz, 67.6 kHz, 75.0 Hz
+[2755922.801] (II) DUMMY(0): Modeline "1152x864"x75.0  104.99  1152 1224 1352 1552  864 865 868 902 -hsync +vsync (67.6 kHz d)
+[2755922.801] (**) DUMMY(0):  Default mode "1152x864": 96.8 MHz, 63.0 kHz, 70.0 Hz
+[2755922.801] (II) DUMMY(0): Modeline "1152x864"x70.0   96.77  1152 1224 1344 1536  864 865 868 900 -hsync +vsync (63.0 kHz d)
+[2755922.801] (**) DUMMY(0):  Default mode "1152x864": 81.6 MHz, 53.7 kHz, 60.0 Hz
+[2755922.801] (II) DUMMY(0): Modeline "1152x864"x60.0   81.62  1152 1216 1336 1520  864 865 868 895 -hsync +vsync (53.7 kHz d)
+[2755922.801] (**) DUMMY(0):  Mode "800x1242": 25.0 MHz, 26.3 kHz, 20.1 Hz
+[2755922.801] (II) DUMMY(0): Modeline "800x1242"x20.1   25.03  800 832 920 952  1242 1271 1275 1305 (26.3 kHz)
+[2755922.801] (**) DUMMY(0):  Mode "1280x768": 23.1 MHz, 16.2 kHz, 20.1 Hz
+[2755922.801] (II) DUMMY(0): Modeline "1280x768"x20.1   23.11  1280 1312 1392 1424  768 786 789 807 (16.2 kHz)
+[2755922.801] (**) DUMMY(0):  Mode "1280x762": 22.9 MHz, 16.1 kHz, 20.1 Hz
+[2755922.801] (II) DUMMY(0): Modeline "1280x762"x20.1   22.93  1280 1312 1392 1424  762 780 783 801 (16.1 kHz)
+[2755922.801] (**) DUMMY(0):  Mode "720x1280": 30.2 MHz, 33.7 kHz, 25.1 Hz
+[2755922.801] (II) DUMMY(0): Modeline "720x1280"x25.1   30.22  720 752 864 896  1280 1309 1315 1345 (33.7 kHz)
+[2755922.801] (**) DUMMY(0):  Mode "1280x720": 27.4 MHz, 18.9 kHz, 25.0 Hz
+[2755922.801] (II) DUMMY(0): Modeline "1280x720"x25.0   27.41  1280 1312 1416 1448  720 737 740 757 (18.9 kHz)
+[2755922.801] (**) DUMMY(0):  Mode "720x1242": 29.2 MHz, 32.9 kHz, 25.2 Hz
+[2755922.801] (II) DUMMY(0): Modeline "720x1242"x25.2   29.20  720 752 856 888  1242 1271 1276 1305 (32.9 kHz)
+[2755922.801] (**) DUMMY(0):  Mode "1280x682": 25.9 MHz, 18.0 kHz, 25.0 Hz
+[2755922.801] (II) DUMMY(0): Modeline "1280x682"x25.0   25.85  1280 1312 1408 1440  682 698 701 717 (18.0 kHz)
+[2755922.801] (**) DUMMY(0):  Mode "1024x768": 18.7 MHz, 16.2 kHz, 20.1 Hz
+[2755922.801] (II) DUMMY(0): Modeline "1024x768"x20.1   18.71  1024 1056 1120 1152  768 786 789 807 (16.2 kHz)
+[2755922.801] (**) DUMMY(0):  Mode "768x1024": 24.9 MHz, 27.1 kHz, 25.2 Hz
+[2755922.801] (II) DUMMY(0): Modeline "768x1024"x25.2   24.93  768 800 888 920  1024 1047 1052 1076 (27.1 kHz)
+[2755922.801] (**) DUMMY(0):  Mode "768x1024": 19.5 MHz, 21.6 kHz, 20.0 Hz
+[2755922.801] (II) DUMMY(0): Modeline "768x1024"x20.0   19.50  768 800 872 904  1024 1048 1052 1076 (21.6 kHz)
+[2755922.801] (**) DUMMY(0):  Default mode "1024x768i": 44.9 MHz, 35.5 kHz, 86.9 Hz (I)
+[2755922.801] (II) DUMMY(0): Modeline "1024x768i"x86.9   44.90  1024 1032 1208 1264  768 768 776 817 interlace +hsync +vsync (35.5 kHz d)
+[2755922.801] (**) DUMMY(0):  Mode "768x986": 23.9 MHz, 26.0 kHz, 25.1 Hz
+[2755922.801] (II) DUMMY(0): Modeline "768x986"x25.1   23.90  768 800 888 920  986 1009 1013 1036 (26.0 kHz)
+[2755922.801] (**) DUMMY(0):  Mode "1024x730": 22.5 MHz, 19.3 kHz, 25.1 Hz
+[2755922.801] (II) DUMMY(0): Modeline "1024x730"x25.1   22.50  1024 1056 1136 1168  730 747 750 767 (19.3 kHz)
+[2755922.801] (**) DUMMY(0):  Default mode "960x720": 170.7 MHz, 128.5 kHz, 85.0 Hz (D)
+[2755922.801] (II) DUMMY(0): Modeline "960x720"x85.0  170.68  960 1036 1144 1328  720 720 722 756 doublescan -hsync +vsync (128.5 kHz d)
+[2755922.801] (**) DUMMY(0):  Default mode "960x720": 148.5 MHz, 112.5 kHz, 75.0 Hz (D)
+[2755922.801] (II) DUMMY(0): Modeline "960x720"x75.0  148.50  960 1032 1144 1320  720 720 722 750 doublescan -hsync +vsync (112.5 kHz d)
+[2755922.801] (**) DUMMY(0):  Default mode "960x720": 117.0 MHz, 90.0 kHz, 60.0 Hz (D)
+[2755922.801] (II) DUMMY(0): Modeline "960x720"x60.0  117.00  960 1024 1128 1300  720 720 722 750 doublescan -hsync +vsync (90.0 kHz d)
+[2755922.801] (**) DUMMY(0):  Default mode "928x696": 144.0 MHz, 112.5 kHz, 75.0 Hz (D)
+[2755922.801] (II) DUMMY(0): Modeline "928x696"x75.0  144.00  928 992 1104 1280  696 696 698 750 doublescan -hsync +vsync (112.5 kHz d)
+[2755922.801] (**) DUMMY(0):  Default mode "928x696": 109.2 MHz, 86.4 kHz, 60.1 Hz (D)
+[2755922.801] (II) DUMMY(0): Modeline "928x696"x60.1  109.15  928 976 1088 1264  696 696 698 719 doublescan -hsync +vsync (86.4 kHz d)
+[2755922.801] (**) DUMMY(0):  Mode "600x1024": 19.9 MHz, 27.0 kHz, 25.1 Hz
+[2755922.801] (II) DUMMY(0): Modeline "600x1024"x25.1   19.90  600 632 704 736  1024 1047 1052 1076 (27.0 kHz)
+[2755922.801] (**) DUMMY(0):  Default mode "896x672": 130.5 MHz, 106.3 kHz, 75.0 Hz (D)
+[2755922.801] (II) DUMMY(0): Modeline "896x672"x75.0  130.50  896 944 1052 1228  672 672 674 708 doublescan -hsync +vsync (106.3 kHz d)
+[2755922.801] (**) DUMMY(0):  Default mode "896x672": 102.4 MHz, 83.7 kHz, 60.0 Hz (D)
+[2755922.801] (II) DUMMY(0): Modeline "896x672"x60.0  102.40  896 960 1060 1224  672 672 674 697 doublescan -hsync +vsync (83.7 kHz d)
+[2755922.801] (**) DUMMY(0):  Mode "600x986": 19.1 MHz, 25.9 kHz, 25.0 Hz
+[2755922.801] (II) DUMMY(0): Modeline "600x986"x25.0   19.07  600 632 704 736  986 1009 1013 1036 (25.9 kHz)
+[2755922.801] (**) DUMMY(0):  Mode "1024x562": 17.0 MHz, 14.8 kHz, 25.0 Hz
+[2755922.801] (II) DUMMY(0): Modeline "1024x562"x25.0   17.03  1024 1056 1120 1152  562 575 578 591 (14.8 kHz)
+[2755922.801] (**) DUMMY(0):  Default mode "832x624": 57.3 MHz, 49.7 kHz, 74.6 Hz
+[2755922.801] (II) DUMMY(0): Modeline "832x624"x74.6   57.28  832 864 928 1152  624 625 628 667 -hsync -vsync (49.7 kHz d)
+[2755922.801] (**) DUMMY(0):  Mode "536x960": 16.7 MHz, 25.5 kHz, 25.3 Hz
+[2755922.801] (II) DUMMY(0): Modeline "536x960"x25.3   16.74  536 568 624 656  960 982 986 1009 (25.5 kHz)
+[2755922.801] (**) DUMMY(0):  Mode "960x536": 15.2 MHz, 14.1 kHz, 25.0 Hz
+[2755922.801] (II) DUMMY(0): Modeline "960x536"x25.0   15.23  960 992 1048 1080  536 548 551 563 (14.1 kHz)
+[2755922.801] (**) DUMMY(0):  Mode "536x922": 16.0 MHz, 24.4 kHz, 25.2 Hz
+[2755922.801] (II) DUMMY(0): Modeline "536x922"x25.2   16.01  536 568 624 656  922 943 947 969 (24.4 kHz)
+[2755922.801] (**) DUMMY(0):  Mode "600x800": 15.2 MHz, 21.1 kHz, 25.1 Hz
+[2755922.801] (II) DUMMY(0): Modeline "600x800"x25.1   15.17  600 632 688 720  800 818 822 841 (21.1 kHz)
+[2755922.801] (**) DUMMY(0):  Mode "960x498": 14.1 MHz, 13.1 kHz, 25.1 Hz
+[2755922.801] (II) DUMMY(0): Modeline "960x498"x25.1   14.09  960 992 1040 1072  498 509 511 523 (13.1 kHz)
+[2755922.801] (**) DUMMY(0):  Mode "600x762": 14.4 MHz, 20.2 kHz, 25.2 Hz
+[2755922.801] (II) DUMMY(0): Modeline "600x762"x25.2   14.39  600 632 680 712  762 779 783 801 (20.2 kHz)
+[2755922.801] (**) DUMMY(0):  Mode "800x562": 13.5 MHz, 14.8 kHz, 25.1 Hz
+[2755922.801] (II) DUMMY(0): Modeline "800x562"x25.1   13.52  800 832 880 912  562 575 578 591 (14.8 kHz)
+[2755922.801] (**) DUMMY(0):  Default mode "840x525": 107.4 MHz, 93.9 kHz, 85.0 Hz (D)
+[2755922.801] (II) DUMMY(0): Modeline "840x525"x85.0  107.38  840 904 992 1144  525 526 529 552 doublescan -hsync +vsync (93.9 kHz d)
+[2755922.801] (**) DUMMY(0):  Default mode "840x525": 93.5 MHz, 82.3 kHz, 75.0 Hz (D)
+[2755922.802] (II) DUMMY(0): Modeline "840x525"x75.0   93.50  840 900 988 1136  525 526 529 549 doublescan -hsync +vsync (82.3 kHz d)
+[2755922.802] (**) DUMMY(0):  Default mode "840x525": 87.0 MHz, 76.6 kHz, 69.9 Hz (D)
+[2755922.802] (II) DUMMY(0): Modeline "840x525"x69.9   87.00  840 900 988 1136  525 526 529 548 doublescan -hsync +vsync (76.6 kHz d)
+[2755922.802] (**) DUMMY(0):  Default mode "840x525": 73.1 MHz, 65.3 kHz, 60.0 Hz (D)
+[2755922.802] (II) DUMMY(0): Modeline "840x525"x60.0   73.12  840 892 980 1120  525 526 529 544 doublescan -hsync +vsync (65.3 kHz d)
+[2755922.802] (**) DUMMY(0):  Mode "480x854": 13.3 MHz, 22.5 kHz, 25.1 Hz
+[2755922.802] (II) DUMMY(0): Modeline "480x854"x25.1   13.34  480 512 560 592  854 873 877 897 (22.5 kHz)
+[2755922.802] (**) DUMMY(0):  Mode "848x480": 12.1 MHz, 12.7 kHz, 25.1 Hz
+[2755922.802] (II) DUMMY(0): Modeline "848x480"x25.1   12.09  848 880 920 952  480 491 493 505 (12.7 kHz)
+[2755922.802] (**) DUMMY(0):  Mode "480x810": 12.6 MHz, 21.6 kHz, 25.3 Hz
+[2755922.802] (II) DUMMY(0): Modeline "480x810"x25.3   12.59  480 512 552 584  810 828 832 851 (21.6 kHz)
+[2755922.802] (**) DUMMY(0):  Mode "480x800": 12.4 MHz, 21.3 kHz, 25.3 Hz
+[2755922.802] (II) DUMMY(0): Modeline "480x800"x25.3   12.43  480 512 552 584  800 818 822 841 (21.3 kHz)
+[2755922.802] (**) DUMMY(0):  Mode "800x480": 11.5 MHz, 12.7 kHz, 25.1 Hz
+[2755922.802] (II) DUMMY(0): Modeline "800x480"x25.1   11.46  800 832 872 904  480 491 493 505 (12.7 kHz)
+[2755922.802] (**) DUMMY(0):  Mode "848x442": 11.1 MHz, 11.6 kHz, 25.1 Hz
+[2755922.802] (II) DUMMY(0): Modeline "848x442"x25.1   11.09  848 880 920 952  442 452 454 465 (11.6 kHz)
+[2755922.802] (**) DUMMY(0):  Default mode "700x525": 89.6 MHz, 93.8 kHz, 85.1 Hz (D)
+[2755922.802] (II) DUMMY(0): Modeline "700x525"x85.1   89.63  700 752 828 956  525 525 527 551 doublescan -hsync +vsync (93.8 kHz d)
+[2755922.802] (**) DUMMY(0):  Default mode "700x525": 77.9 MHz, 81.5 kHz, 74.8 Hz (D)
+[2755922.802] (II) DUMMY(0): Modeline "700x525"x74.8   77.90  700 732 892 956  525 526 532 545 doublescan +hsync +vsync (81.5 kHz d)
+[2755922.802] (**) DUMMY(0):  Default mode "700x525": 72.5 MHz, 76.5 kHz, 70.1 Hz (D)
+[2755922.802] (II) DUMMY(0): Modeline "700x525"x70.1   72.53  700 748 824 948  525 525 527 546 doublescan -hsync +vsync (76.5 kHz d)
+[2755922.802] (**) DUMMY(0):  Default mode "700x525": 61.0 MHz, 64.9 kHz, 60.0 Hz (D)
+[2755922.802] (II) DUMMY(0): Modeline "700x525"x60.0   61.00  700 744 820 940  525 526 532 541 doublescan +hsync +vsync (64.9 kHz d)
+[2755922.802] (**) DUMMY(0):  Mode "480x762": 11.8 MHz, 20.2 kHz, 25.2 Hz
+[2755922.802] (II) DUMMY(0): Modeline "480x762"x25.2   11.79  480 512 552 584  762 779 783 801 (20.2 kHz)
+[2755922.802] (**) DUMMY(0):  Default mode "640x512": 78.8 MHz, 91.1 kHz, 85.0 Hz (D)
+[2755922.802] (II) DUMMY(0): Modeline "640x512"x85.0   78.75  640 672 752 864  512 512 514 536 doublescan +hsync +vsync (91.1 kHz d)
+[2755922.802] (**) DUMMY(0):  Default mode "640x512": 67.5 MHz, 80.0 kHz, 75.0 Hz (D)
+[2755922.802] (II) DUMMY(0): Modeline "640x512"x75.0   67.50  640 648 720 844  512 512 514 533 doublescan +hsync +vsync (80.0 kHz d)
+[2755922.802] (**) DUMMY(0):  Default mode "640x512": 54.0 MHz, 64.0 kHz, 60.0 Hz (D)
+[2755922.802] (II) DUMMY(0): Modeline "640x512"x60.0   54.00  640 664 720 844  512 512 514 533 doublescan +hsync +vsync (64.0 kHz d)
+[2755922.802] (**) DUMMY(0):  Default mode "720x450": 53.2 MHz, 55.9 kHz, 59.9 Hz (D)
+[2755922.802] (II) DUMMY(0): Modeline "720x450"x59.9   53.25  720 760 836 952  450 451 454 467 doublescan -hsync +vsync (55.9 kHz d)
+[2755922.802] (**) DUMMY(0):  Default mode "640x480": 74.2 MHz, 85.9 kHz, 85.1 Hz (D)
+[2755922.802] (II) DUMMY(0): Modeline "640x480"x85.1   74.25  640 672 752 864  480 480 482 505 doublescan +hsync +vsync (85.9 kHz d)
+[2755922.802] (**) DUMMY(0):  Default mode "640x480": 36.0 MHz, 43.3 kHz, 85.0 Hz
+[2755922.802] (II) DUMMY(0): Modeline "640x480"x85.0   36.00  640 696 752 832  480 481 484 509 -hsync -vsync (43.3 kHz d)
+[2755922.802] (**) DUMMY(0):  Default mode "640x480": 31.5 MHz, 37.5 kHz, 75.0 Hz
+[2755922.802] (II) DUMMY(0): Modeline "640x480"x75.0   31.50  640 656 720 840  480 481 484 500 -hsync -vsync (37.5 kHz d)
+[2755922.802] (**) DUMMY(0):  Default mode "640x480": 31.5 MHz, 37.9 kHz, 72.8 Hz
+[2755922.802] (II) DUMMY(0): Modeline "640x480"x72.8   31.50  640 664 704 832  480 489 492 520 -hsync -vsync (37.9 kHz d)
+[2755922.802] (**) DUMMY(0):  Default mode "640x480": 54.0 MHz, 60.0 kHz, 60.0 Hz (D)
+[2755922.802] (II) DUMMY(0): Modeline "640x480"x60.0   54.00  640 688 744 900  480 480 482 500 doublescan +hsync +vsync (60.0 kHz d)
+[2755922.802] (**) DUMMY(0):  Default mode "640x480": 25.2 MHz, 31.5 kHz, 59.9 Hz
+[2755922.802] (II) DUMMY(0): Modeline "640x480"x59.9   25.18  640 656 752 800  480 490 492 525 -hsync -vsync (31.5 kHz d)
+[2755922.802] (**) DUMMY(0):  Default mode "720x400": 35.5 MHz, 37.9 kHz, 85.0 Hz
+[2755922.802] (II) DUMMY(0): Modeline "720x400"x85.0   35.50  720 756 828 936  400 401 404 446 -hsync +vsync (37.9 kHz d)
+[2755922.802] (**) DUMMY(0):  Default mode "680x384": 36.0 MHz, 47.4 kHz, 60.0 Hz (D)
+[2755922.802] (II) DUMMY(0): Modeline "680x384"x60.0   36.00  680 704 720 760  384 385 390 395 doublescan +hsync -vsync (47.4 kHz d)
+[2755922.802] (**) DUMMY(0):  Default mode "680x384": 42.4 MHz, 47.7 kHz, 59.8 Hz (D)
+[2755922.802] (II) DUMMY(0): Modeline "680x384"x59.8   42.38  680 716 784 888  384 385 390 399 doublescan -hsync +vsync (47.7 kHz d)
+[2755922.802] (**) DUMMY(0):  Default mode "640x400": 31.5 MHz, 37.9 kHz, 85.1 Hz
+[2755922.802] (II) DUMMY(0): Modeline "640x400"x85.1   31.50  640 672 736 832  400 401 404 445 -hsync +vsync (37.9 kHz d)
+[2755922.802] (**) DUMMY(0):  Default mode "576x432": 71.7 MHz, 91.5 kHz, 100.1 Hz (D)
+[2755922.802] (II) DUMMY(0): Modeline "576x432"x100.1   71.73  576 616 680 784  432 432 434 457 doublescan -hsync +vsync (91.5 kHz d)
+[2755922.802] (**) DUMMY(0):  Default mode "576x432": 60.8 MHz, 77.5 kHz, 85.2 Hz (D)
+[2755922.802] (II) DUMMY(0): Modeline "576x432"x85.2   60.75  576 608 672 784  432 432 434 455 doublescan +hsync -vsync (77.5 kHz d)
+[2755922.802] (**) DUMMY(0):  Default mode "576x432": 59.8 MHz, 77.1 kHz, 85.1 Hz (D)
+[2755922.802] (II) DUMMY(0): Modeline "576x432"x85.1   59.83  576 612 676 776  432 432 434 453 doublescan -hsync +vsync (77.1 kHz d)
+[2755922.802] (**) DUMMY(0):  Default mode "576x432": 54.0 MHz, 67.5 kHz, 75.0 Hz (D)
+[2755922.802] (II) DUMMY(0): Modeline "576x432"x75.0   54.00  576 608 672 800  432 432 434 450 doublescan +hsync +vsync (67.5 kHz d)
+[2755922.802] (**) DUMMY(0):  Default mode "576x432": 52.5 MHz, 67.6 kHz, 75.0 Hz (D)
+[2755922.802] (II) DUMMY(0): Modeline "576x432"x75.0   52.49  576 612 676 776  432 432 434 451 doublescan -hsync +vsync (67.6 kHz d)
+[2755922.802] (**) DUMMY(0):  Default mode "576x432": 48.4 MHz, 63.0 kHz, 70.0 Hz (D)
+[2755922.802] (II) DUMMY(0): Modeline "576x432"x70.0   48.38  576 612 672 768  432 432 434 450 doublescan -hsync +vsync (63.0 kHz d)
+[2755922.802] (**) DUMMY(0):  Default mode "576x432": 40.8 MHz, 53.7 kHz, 60.1 Hz (D)
+[2755922.802] (II) DUMMY(0): Modeline "576x432"x60.1   40.81  576 608 668 760  432 432 434 447 doublescan -hsync +vsync (53.7 kHz d)
+[2755922.802] (**) DUMMY(0):  Default mode "640x350": 31.5 MHz, 37.9 kHz, 85.1 Hz
+[2755922.802] (II) DUMMY(0): Modeline "640x350"x85.1   31.50  640 672 736 832  350 382 385 445 +hsync -vsync (37.9 kHz d)
+[2755922.802] (**) DUMMY(0):  Default mode "512x384i": 22.4 MHz, 35.5 kHz, 86.6 Hz (D)
+[2755922.802] (II) DUMMY(0): Modeline "512x384i"x86.6   22.45  512 516 604 632  384 384 388 409 interlace doublescan +hsync +vsync (35.5 kHz d)
+[2755922.802] (**) DUMMY(0):  Default mode "512x384": 47.2 MHz, 68.7 kHz, 85.0 Hz (D)
+[2755922.803] (II) DUMMY(0): Modeline "512x384"x85.0   47.25  512 536 584 688  384 384 386 404 doublescan +hsync +vsync (68.7 kHz d)
+[2755922.803] (**) DUMMY(0):  Default mode "512x384": 39.4 MHz, 60.0 kHz, 75.0 Hz (D)
+[2755922.803] (II) DUMMY(0): Modeline "512x384"x75.0   39.38  512 520 568 656  384 384 386 400 doublescan +hsync +vsync (60.0 kHz d)
+[2755922.803] (**) DUMMY(0):  Default mode "512x384": 37.5 MHz, 56.5 kHz, 70.1 Hz (D)
+[2755922.803] (II) DUMMY(0): Modeline "512x384"x70.1   37.50  512 524 592 664  384 385 388 403 doublescan -hsync -vsync (56.5 kHz d)
+[2755922.803] (**) DUMMY(0):  Default mode "512x384": 32.5 MHz, 48.4 kHz, 60.0 Hz (D)
+[2755922.803] (II) DUMMY(0): Modeline "512x384"x60.0   32.50  512 524 592 672  384 385 388 403 doublescan -hsync -vsync (48.4 kHz d)
+[2755922.803] (**) DUMMY(0):  Default mode "416x312": 28.6 MHz, 49.7 kHz, 74.7 Hz (D)
+[2755922.803] (II) DUMMY(0): Modeline "416x312"x74.7   28.64  416 432 464 576  312 312 314 333 doublescan -hsync -vsync (49.7 kHz d)
+[2755922.803] (**) DUMMY(0):  Default mode "400x300": 28.1 MHz, 53.7 kHz, 85.3 Hz (D)
+[2755922.803] (II) DUMMY(0): Modeline "400x300"x85.3   28.15  400 416 448 524  300 300 302 315 doublescan +hsync +vsync (53.7 kHz d)
+[2755922.803] (**) DUMMY(0):  Default mode "400x300": 24.8 MHz, 46.9 kHz, 75.1 Hz (D)
+[2755922.803] (II) DUMMY(0): Modeline "400x300"x75.1   24.75  400 408 448 528  300 300 302 312 doublescan +hsync +vsync (46.9 kHz d)
+[2755922.803] (**) DUMMY(0):  Default mode "400x300": 25.0 MHz, 48.1 kHz, 72.2 Hz (D)
+[2755922.803] (II) DUMMY(0): Modeline "400x300"x72.2   25.00  400 428 488 520  300 318 321 333 doublescan +hsync +vsync (48.1 kHz d)
+[2755922.803] (**) DUMMY(0):  Default mode "400x300": 20.0 MHz, 37.9 kHz, 60.3 Hz (D)
+[2755922.803] (II) DUMMY(0): Modeline "400x300"x60.3   20.00  400 420 484 528  300 300 302 314 doublescan +hsync +vsync (37.9 kHz d)
+[2755922.803] (**) DUMMY(0):  Default mode "400x300": 18.0 MHz, 35.2 kHz, 56.3 Hz (D)
+[2755922.803] (II) DUMMY(0): Modeline "400x300"x56.3   18.00  400 412 448 512  300 300 301 312 doublescan +hsync +vsync (35.2 kHz d)
+[2755922.803] (**) DUMMY(0):  Default mode "320x240": 18.0 MHz, 43.3 kHz, 85.2 Hz (D)
+[2755922.803] (II) DUMMY(0): Modeline "320x240"x85.2   18.00  320 348 376 416  240 240 242 254 doublescan -hsync -vsync (43.3 kHz d)
+[2755922.803] (**) DUMMY(0):  Default mode "320x240": 15.8 MHz, 37.5 kHz, 75.0 Hz (D)
+[2755922.803] (II) DUMMY(0): Modeline "320x240"x75.0   15.75  320 328 360 420  240 240 242 250 doublescan -hsync -vsync (37.5 kHz d)
+[2755922.803] (**) DUMMY(0):  Default mode "320x240": 15.8 MHz, 37.9 kHz, 72.8 Hz (D)
+[2755922.803] (II) DUMMY(0): Modeline "320x240"x72.8   15.75  320 332 352 416  240 244 246 260 doublescan -hsync -vsync (37.9 kHz d)
+[2755922.803] (**) DUMMY(0):  Default mode "320x240": 12.6 MHz, 31.5 kHz, 60.1 Hz (D)
+[2755922.803] (II) DUMMY(0): Modeline "320x240"x60.1   12.59  320 328 376 400  240 245 246 262 doublescan -hsync -vsync (31.5 kHz d)
+[2755922.803] (**) DUMMY(0):  Default mode "360x200": 17.8 MHz, 37.9 kHz, 85.0 Hz (D)
+[2755922.803] (II) DUMMY(0): Modeline "360x200"x85.0   17.75  360 378 414 468  200 200 202 223 doublescan -hsync +vsync (37.9 kHz d)
+[2755922.803] (**) DUMMY(0):  Default mode "320x175": 15.8 MHz, 37.9 kHz, 85.3 Hz (D)
+[2755922.803] (II) DUMMY(0): Modeline "320x175"x85.3   15.75  320 336 368 416  175 191 192 222 doublescan +hsync -vsync (37.9 kHz d)
+[2755922.803] (==) DUMMY(0): DPI set to (96, 96)
+[2755922.803] (II) Loading sub module "fb"
+[2755922.803] (II) LoadModule: "fb"
+[2755922.803] (II) Loading /usr/lib/xorg/modules/libfb.so
+[2755922.803] (II) Module fb: vendor="X.Org Foundation"
+[2755922.803] 	compiled for 1.18.4, module version = 1.0.0
+[2755922.803] 	ABI class: X.Org ANSI C Emulation, version 0.4
+[2755922.803] (II) Loading sub module "ramdac"
+[2755922.803] (II) LoadModule: "ramdac"
+[2755922.803] (II) Module "ramdac" already built-in
+[2755922.803] (--) Depth 24 pixmap format is 32 bpp
+[2755922.803] (II) DUMMY(0): Using 1904 scanlines of offscreen memory 
+[2755922.803] (==) DUMMY(0): Backing store enabled
+[2755922.803] (==) DUMMY(0): Silken mouse enabled
+[2755922.804] (WW) DUMMY(0): Option "ConstantDPI" is not used
+[2755922.804] (==) RandR enabled
+[2755922.809] (II) SELinux: Disabled on system
+[2755922.810] (II) AIGLX: Screen 0 is not DRI2 capable
+[2755922.810] (EE) AIGLX: reverting to software rendering
+[2755923.200] (II) AIGLX: enabled GLX_MESA_copy_sub_buffer
+[2755923.201] (II) AIGLX: Loaded and initialized swrast
+[2755923.201] (II) GLX: Initialized DRISWRAST GL provider for screen 0
+[2755923.374] (II) LoadModule: "void"
+[2755923.375] (WW) Warning, couldn't open module void
+[2755923.375] (II) UnloadModule: "void"
+[2755923.375] (II) Unloading void
+[2755923.375] (EE) Failed to load module "void" (module does not exist, 0)
+[2755923.375] (EE) No input driver matching `void'
+[2755923.375] (II) LoadModule: "void"
+[2755923.375] (WW) Warning, couldn't open module void
+[2755923.376] (II) UnloadModule: "void"
+[2755923.376] (II) Unloading void
+[2755923.376] (EE) Failed to load module "void" (module does not exist, 0)
+[2755923.376] (EE) No input driver matching `void'
+[2755923.390] (II) config/udev: Adding drm device (/dev/dri/card0)
+[2755923.390] (II) xfree86: Adding drm device (/dev/dri/card0)
+[2755923.390] (II) config/udev: Ignoring already known drm device (/dev/dri/card0)
+[2755928.715] (II) Server terminated successfully (0). Closing log file.
