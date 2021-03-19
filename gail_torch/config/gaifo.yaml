@@ -1,0 +1,18 @@
+basic:
+  exp_name: smarts-gaifo
+  model_save_dir: ./assets/learned_models
+  expert_path: ../expert.pkl
+  tb_log_dir: ./assets/tblogs
+
+env_specs:
+  env_name: SMARTS-Imitation-v0
+
+exp_params:
+  state_only: True
+  memory_size: 10000
+  update_timestep: 1024
+  num_updates: 2000
+  num_threads: 1
+
+others:
+  model_save_freq: 0
