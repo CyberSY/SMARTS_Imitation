@@ -48,16 +48,27 @@ def main(scenarios):
     cars_obs_next = {}
     cars_terminals = {}
 
-    active_cars_cnt = 0
-    ended_cars = []
-
+    prev_vehicles = set()
+    done_vehicles = set()
     while True:
-
         smarts.step({})
+
+        current_vehicles = smarts.vehicle_index.social_vehicle_ids()
+        done_vehicles = prev_vehicles - current_vehicles
+        prev_vehicles = current_vehicles
+
+        if len(current_vehicles) == 0:
+            break
+
         smarts.attach_sensors_to_vehicles(
             agent_spec, smarts.vehicle_index.social_vehicle_ids()
         )
         obs, _, _, dones = smarts.observe_from(smarts.vehicle_index.social_vehicle_ids())
+
+        for v in done_vehicles:
+            cars_terminals[f"Agent-{v}"][-1] = True
+            print(f"Agent-{v} Ended")
+
         for k in obs.keys():
             obs[k] = observation_adapter(obs[k])
 
@@ -75,22 +86,13 @@ def main(scenarios):
             ego_state = np.concatenate(ego_state, axis=1).reshape(-1)
             other_info = np.concatenate(other_info, axis=1).reshape(-1)
             full_obs = np.concatenate((ego_state, other_info))
-            if car in ended_cars:
-                continue
+
             if cars_obs.__contains__(car):
                 cars_obs[car].append(full_obs)
                 cars_terminals[car].append(dones[car])
-                if dones[car]:
-                    active_cars_cnt -= 1
-                    ended_cars.append(car)
-                    print("{} Ended".format(car))
             else:
                 cars_obs[car] = [full_obs]
                 cars_terminals[car] = [dones[car]]
-                active_cars_cnt += 1
-
-        if active_cars_cnt == 0:
-            break
 
     for car in cars_obs:
         cars_obs[car] = np.array(cars_obs[car])
@@ -101,12 +103,10 @@ def main(scenarios):
         expert_obs_next.append(cars_obs_next[car])
         expert_terminals.append(cars_terminals[car])
 
-    expert_obs = np.concatenate(expert_obs)
-    expert_obs_next = np.concatenate(expert_obs_next)
-    expert_terminals = np.concatenate(expert_terminals)
-
     with open("expert.pkl", "wb") as f:
-        pickle.dump([{"observation": expert_obs, "next_observation": expert_obs_next, "done": expert_terminals}], f)
+        pickle.dump({"observation": expert_obs, "next_observation": expert_obs_next, "done": expert_terminals}, f)
+
+    smarts.destroy()
 
 
 if __name__ == "__main__":

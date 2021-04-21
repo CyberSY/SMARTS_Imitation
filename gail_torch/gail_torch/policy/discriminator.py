@@ -1,34 +1,10 @@
 from torch import nn
 import torch
 import gym
-import numpy as np
 from abc import ABC
 import torch.nn.functional as F
 
-from gail_torch.utils import MultiAgentMemory
 from gail_torch.model import discriminator_net
-
-
-class MultiAgentDiscriminator(ABC, nn.Module):
-    def __init__(
-        self,
-        discriminators,
-        expert_memory: MultiAgentMemory,
-        device=torch.device("cpu"),
-    ):
-        super(MultiAgentDiscriminator, self).__init__()
-        self.agent_num = len(discriminators)
-        self.discriminators = discriminators
-        self.expert_memory = expert_memory
-        self.device = device
-        self._cnt = 0
-        for i in range(self.agent_num):
-            self.discriminators[i].set_agent_id(i)
-
-    def update(self, memory: MultiAgentMemory):
-        for discriminator in self.discriminators:
-            discriminator.update(memory, self.expert_memory)
-        self._cnt += 1
 
 
 class Discriminator(ABC, nn.Module):
@@ -49,7 +25,6 @@ class Discriminator(ABC, nn.Module):
         self.action_space = action_space
         self.writer = writer
         self.device = device
-        self.agent_id = agent_id
         self.expert_memory = expert_memory
         self.state_only = state_only
         if state_only:
@@ -72,21 +47,17 @@ class Discriminator(ABC, nn.Module):
         del state["writer"]
         return state
 
-    def set_agent_id(self, agent_id: int):
-        assert agent_id >= 0, "Agent id must be non-negative"
-        self.agent_id = agent_id
-
     def update(self, memory, expert_memory=None):
         if expert_memory is None:
             assert self.expert_memory is not None
             expert_memory = self.expert_memory
 
         batch_size = len(memory)
-        agent_batch = memory.collect(self.agent_id)
+        agent_batch = memory.collect()
         assert (
             len(expert_memory) > batch_size
         ), "expert dataset must be larger than batch size"
-        expert_batch = expert_memory.sample(batch_size, self.agent_id)
+        expert_batch = expert_memory.sample(batch_size)
 
         agent_obs = torch.from_numpy(agent_batch["observation"]).to(
             self.device, torch.float
@@ -95,10 +66,10 @@ class Discriminator(ABC, nn.Module):
             agent_next_obs = torch.from_numpy(agent_batch["next_observation"]).to(
                 self.device, torch.float
             )
-            agent_input = torch.cat([agent_obs, agent_next_obs])
+            agent_input = torch.cat([agent_obs, agent_next_obs], dim=-1)
         else:
             agent_act = torch.from_numpy(agent_batch["action"]).to(self.device, torch.float)
-            agent_input = torch.cat([agent_obs, agent_act], dim=1)
+            agent_input = torch.cat([agent_obs, agent_act], dim=-1)
         agent_prob = self.discriminator(agent_input)
 
         expert_obs = torch.from_numpy(expert_batch["observation"]).to(

@@ -147,7 +147,7 @@ class Memory:
             trajs.append(self._encode_sample(idxes))
         return trajs
 
-    def collect(self, agent_id=None):
+    def collect(self):
         return self.sample(-1)
 
     def append(self, memory):

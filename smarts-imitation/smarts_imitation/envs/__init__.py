@@ -1,2 +1,1 @@
 from smarts_imitation.envs.traffic_gym import SMARTSImitation
-from smarts_imitation.envs.frame_stack import FrameStack

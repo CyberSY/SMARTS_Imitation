@@ -22,6 +22,7 @@ class PPOPolicy(BasePolicy):
         optim_epochs=10,
         mini_batch_size=64,
         num_units=128,
+        activation="tanh",
         **kwargs: Any,
     ) -> None:
         super(PPOPolicy, self).__init__(**kwargs)
@@ -30,7 +31,7 @@ class PPOPolicy(BasePolicy):
         assert 0.0 <= gae_lambda <= 1.0, "GAE lambda should be in [0, 1]."
         self.obs_dim = self.observation_space.shape[0]
         self.act_dim = self.action_space.shape[0]
-        self.actor = continuous_actor(self.obs_dim, self.act_dim, num_units)
+        self.actor = continuous_actor(self.obs_dim, self.act_dim, num_units, activation=activation)
         self.critic = continuous_critic(self.obs_dim, num_units)
         self.actor_optim = torch.optim.Adam(self.actor.parameters(), lr=lr)
         self.critic_optim = torch.optim.Adam(self.critic.parameters(), lr=lr)
@@ -45,11 +46,11 @@ class PPOPolicy(BasePolicy):
         act_mean, _, act_std = self.actor(
             torch.from_numpy(obs).to(self.device, torch.float).unsqueeze(0)
         )
-        act = torch.normal(act_mean, act_std)
+        act = torch.normal(act_mean, act_std)[0]
         return act, {}
 
     def update(self, memory):
-        batch = memory.collect(self.agent_id)
+        batch = memory.collect()
 
         obs = torch.from_numpy(batch["observation"]).to(self.device, torch.float)
         act = torch.from_numpy(batch["action"]).to(self.device, torch.int64)

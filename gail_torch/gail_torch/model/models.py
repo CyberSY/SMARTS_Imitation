@@ -91,12 +91,16 @@ class discriminator_net(nn.Module):
 
 
 class continuous_actor(nn.Module):
-    def __init__(self, num_inputs, action_dim, num_units, log_std=0):
+    def __init__(self, num_inputs, action_dim, num_units, log_std=0, activation=None):
         super(continuous_actor, self).__init__()
         self.LReLU = nn.LeakyReLU(0.01)
         self.fc_in = nn.Linear(num_inputs, num_units)
         self.fc1 = nn.Linear(num_units, num_units)
         self.fc_out = nn.Linear(num_units, action_dim)
+        if activation == "tanh":
+            self.activation_func = nn.Tanh()
+        elif activation is None:
+            self.activation_func = None
 
         self.action_log_std = nn.Parameter(torch.ones(1, action_dim) * log_std)
 
@@ -109,7 +113,10 @@ class continuous_actor(nn.Module):
     def forward(self, x):
         x = self.LReLU(self.fc_in(x))
         x = self.LReLU(self.fc1(x))
-        action_mean = self.fc_out(x)
+        if self.activation_func is None:
+            action_mean = self.fc_out(x)
+        else:
+            action_mean = self.activation_func(self.fc_out(x))
         action_log_std = self.action_log_std.expand_as(action_mean)
         action_std = torch.exp(action_log_std)
         return action_mean, action_log_std, action_std

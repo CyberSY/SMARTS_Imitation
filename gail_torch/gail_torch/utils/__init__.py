@@ -1,13 +1,12 @@
 import torch
 
-from gail_torch.utils.memory import Memory, MultiAgentMemory
+from gail_torch.utils.memory import Memory
 from gail_torch.utils.tools import (
     estimate_advantages,
     make_env,
     flat_dict_to_episode,
     generate_tune_config,
 )
-from gail_torch.utils.zfilter import ZFilter
 from gail_torch.utils.math import normal_log_density
 
 

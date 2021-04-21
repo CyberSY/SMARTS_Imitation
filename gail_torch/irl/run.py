@@ -18,7 +18,7 @@ def do_train(config):
     """
     env = make_env(config["env_specs"]["env_name"])
     print("=============================")
-    print("=1 env {} is right ...".format(args.env_name))
+    print("=1 env {} is right ...".format(config["env_specs"]["env_name"]))
     print("=============================")
 
     expert_memory = Memory(
@@ -44,6 +44,7 @@ def do_train(config):
         observation_space=env.observation_space,
         action_space=env.action_space,
         writer=writer,
+        expert_memory=expert_memory,
         state_only=config["exp_params"]["state_only"],
         device=config["basic"]["device"],
     ).to(config["basic"]["device"])
@@ -63,6 +64,7 @@ def do_train(config):
             observation_space=env.observation_space,
             action_space=env.action_space,
             discriminator=discriminator,
+            activation="tanh",
             writer=writer,
             device=config["basic"]["device"],
         ).to(config["basic"]["device"])
@@ -102,7 +104,7 @@ def do_train(config):
             )
             print("=model saved at episode {}".format(update_cnt))
 
-        memory = sampler.collect_samples(config["exp_params"]["update_timestep"])
+        memory, _ = sampler.collect_samples(config["exp_params"]["update_timestep"])
         policy.update(memory)
         discriminator.update(memory)
 
@@ -132,7 +134,7 @@ if __name__ == "__main__":
         print("\nUSING TENSORBOARD LOG\n")
 
     if torch.cuda.is_available():
-        device = torch.device("cuda:0")
+        device = torch.device("cuda")
         print("USING GPU\n")
     else:
         device = torch.device("cpu")
@@ -149,4 +151,4 @@ if __name__ == "__main__":
 
     print(config, "\n")
 
-    do_train(args)
+    do_train(config)

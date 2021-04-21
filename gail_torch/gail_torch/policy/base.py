@@ -8,7 +8,6 @@ class BasePolicy(ABC, nn.Module):
         self,
         observation_space,
         action_space,
-        agent_id=None,
         discriminator=None,
         device=torch.device("cpu"),
         writer=None,
@@ -18,7 +17,6 @@ class BasePolicy(ABC, nn.Module):
         self.action_space = action_space
         self.writer = writer
         self.device = device
-        self.agent_id = agent_id
         self.discriminator = discriminator
         self._cnt = 0
 
@@ -26,10 +24,6 @@ class BasePolicy(ABC, nn.Module):
         state = self.__dict__.copy()
         del state["writer"]
         return state
-
-    def set_agent_id(self, agent_id: int):
-        assert agent_id >= 0, "Agent id must be non-negative"
-        self.agent_id = agent_id
 
     def set_device(self, device):
         self.device = device

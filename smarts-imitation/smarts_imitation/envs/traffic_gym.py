@@ -1,9 +1,11 @@
 import numpy as np
 import gym
+from dataclasses import replace
 
 from smarts.core.smarts import SMARTS
 from smarts.core.sumo_traffic_simulation import SumoTrafficSimulation
 from smarts.core.scenario import Scenario
+from smarts.core.traffic_history_provider import TrafficHistoryProvider
 from envision.client import Client as Envision
 
 from smarts_imitation.utils import agent
@@ -61,10 +63,21 @@ class SMARTSImitation(gym.Env):
     def reset(self):
         if self.agent_itr >= len(self.agent_ids):
             self._next_scenario()
+
         self.agent_id = self.agent_ids[self.agent_itr]
         agent_mission = self.agent_missions[self.agent_id]
         self.scenario.set_ego_missions({self.agent_id: agent_mission})
         self.smarts.switch_ego_agent({self.agent_id: self.agent_spec.interface})
+
+        traffic_history_provider = self.smarts.get_provider_by_type(
+            TrafficHistoryProvider
+        )
+        assert traffic_history_provider
+        traffic_history_provider.start_time = agent_mission.start_time
+
+        modified_mission = replace(agent_mission, start_time=0.0)
+        self.scenario.set_ego_missions({self.agent_id: modified_mission})
+
         observations = self.smarts.reset(self.scenario)
         full_obs = self._convert_obs(observations)
         self.agent_itr += 1
