@@ -24,11 +24,13 @@ def collect_samples(
     total_reward = 0
     total_eplen = 0
     num_episodes = 0
+    total_distance = 0
 
     while num_steps < batch_size:
         obs = env.reset()
         reward_episode = 0
         eplen_episode = 0
+        initial_ego_pos = obs[0]
 
         for t in range(10000):
             with torch.no_grad():
@@ -47,6 +49,7 @@ def collect_samples(
             if render:
                 env.render()
             if done:
+                total_distance += abs(obs[0] - initial_ego_pos)
                 break
 
             obs = next_obs
@@ -63,6 +66,8 @@ def collect_samples(
     log["avg_reward"] = total_reward / num_episodes
     log["total_eplen"] = total_eplen
     log["avg_eplen"] = total_eplen / num_episodes
+    log["total_distance"] = total_distance
+    log["avg_distance"] = total_distance / num_episodes
 
     if queue is not None:
         queue.put([pid, memory, log])
@@ -74,10 +79,12 @@ def merge_log(log_list):
     log = dict()
     log["total_reward"] = sum([x["total_reward"] for x in log_list])
     log["total_eplen"] = sum([x["total_eplen"] for x in log_list])
+    log["total_distance"] = sum([x["total_distance"] for x in log_list])
     log["num_episodes"] = sum([x["num_episodes"] for x in log_list])
     log["num_steps"] = sum([x["num_steps"] for x in log_list])
     log["avg_reward"] = log["total_reward"] / log["num_episodes"]
     log["avg_eplen"] = log["total_eplen"] / log["num_episodes"]
+    log["avg_distance"] = log["total_distance"] / log["num_episodes"]
     return log
 
 
@@ -145,15 +152,15 @@ class Sampler:
             log = merge_log(log_list)
 
         print(
-            "=iter {}, eplen {:.1f}, reward {:.2f}".format(
-                self._cnt, log["avg_eplen"], log["avg_reward"]
+            "=iter {}, eplen {:.1f}, distance {:.2f}".format(
+                self._cnt, log["avg_eplen"], log["avg_distance"]
             ),
         )
 
         if self.writer is not None:
             self.writer.add_scalar(
-                "Global/Reward/episode_reward",
-                log["avg_reward"],
+                "Global/Info/distance_traveled",
+                log["avg_distance"],
                 self._cnt,
             )
             self.writer.add_scalar(
@@ -165,7 +172,7 @@ class Sampler:
         self.policy.set_device(self.device)
 
         metrics_dict = {}
-        metrics_dict["avg_reward"] = log["avg_reward"]
+        metrics_dict["avg_distance"] = log["avg_distance"]
         metrics_dict["avg_eplen"] = log["avg_eplen"]
 
         self._cnt += 1

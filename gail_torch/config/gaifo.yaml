@@ -13,6 +13,9 @@ exp_params:
   update_timestep: 256
   num_updates: 2000
   num_threads: 1
+  actor_lr: 0.0003
+  critic_lr: 0.0003
+  disc_lr: 0.0003
 
 others:
   model_save_freq: 0

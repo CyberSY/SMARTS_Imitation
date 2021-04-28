@@ -14,7 +14,8 @@ from gail_torch.utils import estimate_advantages
 class PPOPolicy(BasePolicy):
     def __init__(
         self,
-        lr=3e-4,
+        actor_lr=3e-4,
+        critic_lr=3e-4,
         l2_reg=1e-3,
         gamma=0.95,
         eps_clip=0.1,
@@ -33,8 +34,8 @@ class PPOPolicy(BasePolicy):
         self.act_dim = self.action_space.shape[0]
         self.actor = continuous_actor(self.obs_dim, self.act_dim, num_units, activation=activation)
         self.critic = continuous_critic(self.obs_dim, num_units)
-        self.actor_optim = torch.optim.Adam(self.actor.parameters(), lr=lr)
-        self.critic_optim = torch.optim.Adam(self.critic.parameters(), lr=lr)
+        self.actor_optim = torch.optim.Adam(self.actor.parameters(), lr=actor_lr)
+        self.critic_optim = torch.optim.Adam(self.critic.parameters(), lr=critic_lr)
         self.optim_epochs = optim_epochs
         self.eps_clip = eps_clip
         self.gae_lambda = gae_lambda
@@ -79,8 +80,8 @@ class PPOPolicy(BasePolicy):
             rew, done, values, self.gamma, self.gae_lambda, self.device
         )
 
-        policy_losses = []
-        value_losses = []
+        actor_losses = []
+        critic_losses = []
 
         optim_iter_num = int(math.ceil(obs.shape[0] / self.mini_batch_size))
         for _ in range(self.optim_epochs):
@@ -119,7 +120,7 @@ class PPOPolicy(BasePolicy):
                 self.critic_optim.zero_grad()
                 value_loss.backward()
                 self.critic_optim.step()
-                value_losses.append(value_loss.item())
+                critic_losses.append(value_loss.item())
 
                 ratios = torch.exp(log_probs - fixed_log_probs_b)
                 surr1 = ratios * advantages_b
@@ -133,15 +134,16 @@ class PPOPolicy(BasePolicy):
                 policy_loss.backward()
                 torch.nn.utils.clip_grad_norm_(self.actor.parameters(), 40)
                 self.actor_optim.step()
-                policy_losses.append(policy_loss.item())
+                actor_losses.append(policy_loss.item())
 
         if self.writer is not None:
-            prefix = f"Agent_{self.agent_id}/" if self.agent_id is not None else ""
             self.writer.add_scalar(
-                prefix + "Loss/policy_loss", np.mean(policy_losses), self._cnt
+                "Loss/actor_loss", np.mean(actor_losses), self._cnt
             )
             self.writer.add_scalar(
-                prefix + "Loss/value_loss", np.mean(value_losses), self._cnt
+                "Loss/critic_loss", np.mean(critic_losses), self._cnt
             )
 
         self._cnt += 1
+
+        return {"actor_loss": np.mean(actor_losses), "critic_loss": np.mean(critic_losses)}

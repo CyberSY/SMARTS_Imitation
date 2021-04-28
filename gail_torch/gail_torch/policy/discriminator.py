@@ -95,10 +95,10 @@ class Discriminator(ABC, nn.Module):
         self.discriminator_optim.step()
 
         if self.writer is not None:
-            prefix = f"Agent_{self.agent_id}/" if self.agent_id is not None else ""
-            self.writer.add_scalar(prefix + "Loss/discriminator_loss", loss, self._cnt)
+            self.writer.add_scalar("Loss/discriminator_loss", loss, self._cnt)
 
         self._cnt += 1
+        return {"discriminator_loss": loss.item()}
 
     def get_reward(self, input_):
         input_ = input_.to(self.device)

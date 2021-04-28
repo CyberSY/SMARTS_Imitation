@@ -32,7 +32,7 @@ def do_train(config):
 
     if config["others"]["use_tensorboard_log"]:
         log_dir = os.path.join(
-            config["basic"]["log_dir"],
+            config["basic"]["tb_log_dir"],
             config["basic"]["exp_name"],
             datetime.now().strftime("%Y.%m.%d.%H.%M.%S"),
         )
@@ -44,26 +44,31 @@ def do_train(config):
         observation_space=env.observation_space,
         action_space=env.action_space,
         writer=writer,
+        lr=config["exp_params"]["disc_lr"],
         expert_memory=expert_memory,
         state_only=config["exp_params"]["state_only"],
         device=config["basic"]["device"],
     ).to(config["basic"]["device"])
 
     if isinstance(env.action_space, gym.spaces.Discrete):
-        print("=2 using discrete ppo policy ...")
+        print("=3 using discrete ppo policy ...")
         policy = DiscretePPOPolicy(
             observation_space=env.observation_space,
             action_space=env.action_space,
             discriminator=discriminator,
+            actor_lr=config["exp_params"]["actor_lr"],
+            critic_lr=config["exp_params"]["critic_lr"],
             writer=writer,
             device=config["basic"]["device"],
         ).to(config["basic"]["device"])
     elif isinstance(env.action_space, gym.spaces.Box):
-        print("=2 using continuous ppo policy ...")
+        print("=3 using continuous ppo policy ...")
         policy = PPOPolicy(
             observation_space=env.observation_space,
             action_space=env.action_space,
             discriminator=discriminator,
+            actor_lr=config["exp_params"]["actor_lr"],
+            critic_lr=config["exp_params"]["critic_lr"],
             activation="tanh",
             writer=writer,
             device=config["basic"]["device"],
@@ -80,7 +85,7 @@ def do_train(config):
 
     memory = Memory(config["exp_params"]["memory_size"], action_space=env.action_space)
 
-    print("=3 starting iterations ...")
+    print("=4 starting iterations ...")
     print("=============================")
     sampler = Sampler(
         env,
@@ -124,6 +129,10 @@ if __name__ == "__main__":
         "-t",
         action="store_true",
     )
+    parser.add_argument(
+        "--use_cpu",
+        action="store_true",
+    )
     args = parser.parse_args()
 
     with open(args.exp_config, "rb") as f:
@@ -133,10 +142,11 @@ if __name__ == "__main__":
     if args.use_tensorboard_log:
         print("\nUSING TENSORBOARD LOG\n")
 
-    if torch.cuda.is_available():
+    if torch.cuda.is_available() and not args.use_cpu:
         device = torch.device("cuda")
         print("USING GPU\n")
     else:
+        print("USING CPU\n")
         device = torch.device("cpu")
     config["basic"]["device"] = device
 
