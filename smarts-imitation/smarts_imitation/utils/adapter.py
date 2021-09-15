@@ -37,10 +37,17 @@ def get_observation_adapter(obs_stack_size):
     return observation_adapter
 
 
+# def get_action_adapter():
+#     def action_adapter(model_action):
+#         assert len(model_action) == 2
+#         throttle = np.clip(model_action[0], 0, 1)
+#         brake = np.abs(np.clip(model_action[0], -1, 0))
+#         return np.asarray([throttle, brake, model_action[1]])
+#     return action_adapter
+
+
 def get_action_adapter():
     def action_adapter(model_action):
         assert len(model_action) == 2
-        throttle = np.clip(model_action[0], 0, 1)
-        brake = np.abs(np.clip(model_action[0], -1, 0))
-        return np.asarray([throttle, brake, model_action[1]])
+        return (model_action[0], model_action[1])
     return action_adapter

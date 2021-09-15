@@ -138,3 +138,4 @@ xdummy.log.old
 xorg.sh
 .nfs*
 assets/
+*.pkl

@@ -3,10 +3,8 @@ import gym
 from dataclasses import replace
 
 from smarts.core.smarts import SMARTS
-from smarts.core.sumo_traffic_simulation import SumoTrafficSimulation
 from smarts.core.scenario import Scenario
 from smarts.core.traffic_history_provider import TrafficHistoryProvider
-from envision.client import Client as Envision
 
 from smarts_imitation.utils import agent
 
@@ -25,24 +23,24 @@ class SMARTSImitation(gym.Env):
 
         self.smarts = SMARTS(
             agent_interfaces={},
-            traffic_sim=SumoTrafficSimulation(headless=True, auto_start=True),
-            # envision=Envision(),
+            traffic_sim=None,
+            envision=None,
         )
 
     def seed(self, seed):
         np.random.seed(seed)
 
     def _convert_obs(self, observations):
-        observations[self.agent_id] = self.agent_spec.observation_adapter(
-            observations[self.agent_id]
+        observations[self.vehicle_id] = self.agent_spec.observation_adapter(
+            observations[self.vehicle_id]
         )
         ego_state = []
         other_info = []
-        for feat in observations[self.agent_id]:
+        for feat in observations[self.vehicle_id]:
             if feat in ["ego_pos", "speed", "heading"]:
-                ego_state.append(observations[self.agent_id][feat])
+                ego_state.append(observations[self.vehicle_id][feat])
             else:
-                other_info.append(observations[self.agent_id][feat])
+                other_info.append(observations[self.vehicle_id][feat])
         ego_state = np.concatenate(ego_state, axis=1).reshape(-1)
         other_info = np.concatenate(other_info, axis=1).reshape(-1)
         full_obs = np.concatenate((ego_state, other_info))
@@ -50,45 +48,44 @@ class SMARTSImitation(gym.Env):
 
     def step(self, action):
         observations, rewards, dones, infos = self.smarts.step(
-            {self.agent_id: self.agent_spec.action_adapter(action)}
+            {self.vehicle_id: self.agent_spec.action_adapter(action)}
         )
         full_obs = self._convert_obs(observations)
         return (
             full_obs,
-            rewards[self.agent_id],
-            dones[self.agent_id],
+            rewards[self.vehicle_id],
+            dones[self.vehicle_id],
             {},
         )
 
     def reset(self):
-        if self.agent_itr >= len(self.agent_ids):
+        if self.vehicle_itr >= len(self.vehicle_ids):
             self._next_scenario()
 
-        self.agent_id = self.agent_ids[self.agent_itr]
-        agent_mission = self.agent_missions[self.agent_id]
-        self.scenario.set_ego_missions({self.agent_id: agent_mission})
-        self.smarts.switch_ego_agent({self.agent_id: self.agent_spec.interface})
+        self.vehicle_id = self.vehicle_ids[self.vehicle_itr]
+        vehicle_mission = self.vehicle_missions[self.vehicle_id]
 
         traffic_history_provider = self.smarts.get_provider_by_type(
             TrafficHistoryProvider
         )
         assert traffic_history_provider
-        traffic_history_provider.start_time = agent_mission.start_time
+        traffic_history_provider.start_time = vehicle_mission.start_time
 
-        modified_mission = replace(agent_mission, start_time=0.0)
-        self.scenario.set_ego_missions({self.agent_id: modified_mission})
+        modified_mission = replace(vehicle_mission, start_time=0.0)
+        self.scenario.set_ego_missions({self.vehicle_id: modified_mission})
+        self.smarts.switch_ego_agents({self.vehicle_id: self.agent_spec.interface})
 
         observations = self.smarts.reset(self.scenario)
         full_obs = self._convert_obs(observations)
-        self.agent_itr += 1
+        self.vehicle_itr += 1
         return full_obs
 
     def _next_scenario(self):
         self.scenario = next(self.scenarios_iterator)
-        self.agent_missions = self.scenario.discover_missions_of_traffic_histories()
-        self.agent_ids = list(self.agent_missions.keys())
-        np.random.shuffle(self.agent_ids)
-        self.agent_itr = 0
+        self.vehicle_missions = self.scenario.discover_missions_of_traffic_histories()
+        self.vehicle_ids = list(self.vehicle_missions.keys())
+        np.random.shuffle(self.vehicle_ids)
+        self.vehicle_itr = 0
 
     def destroy(self):
         if self.smarts is not None:

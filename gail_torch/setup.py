@@ -11,4 +11,9 @@ setup(
         "gail_torch.utils",
         "gail_torch.sampler",
     ],
+    install_requires=[
+        "torch",
+        "tensorboard",
+        "ray[tune]",
+    ],
 )

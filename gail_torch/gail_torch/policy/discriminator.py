@@ -31,7 +31,9 @@ class Discriminator(ABC, nn.Module):
             num_inputs = self.observation_space.shape[0] * 2  # obs and next_obs
         else:
             if isinstance(self.action_space, gym.spaces.Box):
-                num_inputs = self.observation_space.shape[0] + self.action_space.shape[0]
+                num_inputs = (
+                    self.observation_space.shape[0] + self.action_space.shape[0]
+                )
             else:
                 num_inputs = self.observation_space.shape[0] + self.action_space.n
                 self._discrete_act = True
@@ -68,7 +70,9 @@ class Discriminator(ABC, nn.Module):
             )
             agent_input = torch.cat([agent_obs, agent_next_obs], dim=-1)
         else:
-            agent_act = torch.from_numpy(agent_batch["action"]).to(self.device, torch.float)
+            agent_act = torch.from_numpy(agent_batch["action"]).to(
+                self.device, torch.float
+            )
             agent_input = torch.cat([agent_obs, agent_act], dim=-1)
         agent_prob = self.discriminator(agent_input)
 

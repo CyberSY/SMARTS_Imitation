@@ -15,7 +15,7 @@ def get_agent_spec(obs_stack_size):
             ogm=False,
             rgb=False,
             lidar=False,
-            action=ActionSpaceType.Continuous,
+            action=ActionSpaceType.Imitation,
         ),
         observation_adapter=adapter.get_observation_adapter(obs_stack_size),
         action_adapter=adapter.get_action_adapter(),

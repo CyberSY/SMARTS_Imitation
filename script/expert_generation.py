@@ -11,7 +11,7 @@ from smarts_imitation.utils import agent
 
 
 def main(scenarios):
-    """ Collect expert observations.
+    """Collect expert observations.
 
     Each input scenario is associated with some trajectory files. These trajectories
     will be replayed on SMARTS and observations of each vehicle will be collected and
@@ -31,7 +31,8 @@ def main(scenarios):
 
     smarts = SMARTS(
         agent_interfaces={},
-        traffic_sim=SumoTrafficSimulation(headless=True, auto_start=True),
+        traffic_sim=None,
+        # traffic_sim=SumoTrafficSimulation(headless=True, auto_start=True),
         # envision=Envision(),
     )
     scenarios_iterator = Scenario.scenario_variations(
@@ -63,7 +64,9 @@ def main(scenarios):
         smarts.attach_sensors_to_vehicles(
             agent_spec, smarts.vehicle_index.social_vehicle_ids()
         )
-        obs, _, _, dones = smarts.observe_from(smarts.vehicle_index.social_vehicle_ids())
+        obs, _, _, dones = smarts.observe_from(
+            smarts.vehicle_index.social_vehicle_ids()
+        )
 
         for v in done_vehicles:
             cars_terminals[f"Agent-{v}"][-1] = True
@@ -104,7 +107,14 @@ def main(scenarios):
         expert_terminals.append(cars_terminals[car])
 
     with open("expert.pkl", "wb") as f:
-        pickle.dump({"observation": expert_obs, "next_observation": expert_obs_next, "done": expert_terminals}, f)
+        pickle.dump(
+            {
+                "observation": expert_obs,
+                "next_observation": expert_obs_next,
+                "done": expert_terminals,
+            },
+            f,
+        )
 
     smarts.destroy()
 

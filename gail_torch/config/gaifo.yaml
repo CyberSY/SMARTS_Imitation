@@ -10,7 +10,7 @@ env_specs:
 exp_params:
   state_only: True
   memory_size: 200000
-  update_timestep: 256
+  update_timestep: 1024
   num_updates: 2000
   num_threads: 1
   actor_lr: 0.0003

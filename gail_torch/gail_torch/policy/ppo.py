@@ -32,7 +32,9 @@ class PPOPolicy(BasePolicy):
         assert 0.0 <= gae_lambda <= 1.0, "GAE lambda should be in [0, 1]."
         self.obs_dim = self.observation_space.shape[0]
         self.act_dim = self.action_space.shape[0]
-        self.actor = continuous_actor(self.obs_dim, self.act_dim, num_units, activation=activation)
+        self.actor = continuous_actor(
+            self.obs_dim, self.act_dim, num_units, activation=activation
+        )
         self.critic = continuous_critic(self.obs_dim, num_units)
         self.actor_optim = torch.optim.Adam(self.actor.parameters(), lr=actor_lr)
         self.critic_optim = torch.optim.Adam(self.critic.parameters(), lr=critic_lr)
@@ -55,7 +57,9 @@ class PPOPolicy(BasePolicy):
 
         obs = torch.from_numpy(batch["observation"]).to(self.device, torch.float)
         act = torch.from_numpy(batch["action"]).to(self.device, torch.int64)
-        next_obs = torch.from_numpy(batch["next_observation"]).to(self.device, torch.float)
+        next_obs = torch.from_numpy(batch["next_observation"]).to(
+            self.device, torch.float
+        )
         done = torch.tensor(batch["done"], dtype=torch.float, device=self.device)
 
         if self.discriminator is not None:
@@ -137,13 +141,14 @@ class PPOPolicy(BasePolicy):
                 actor_losses.append(policy_loss.item())
 
         if self.writer is not None:
-            self.writer.add_scalar(
-                "Loss/actor_loss", np.mean(actor_losses), self._cnt
-            )
+            self.writer.add_scalar("Loss/actor_loss", np.mean(actor_losses), self._cnt)
             self.writer.add_scalar(
                 "Loss/critic_loss", np.mean(critic_losses), self._cnt
             )
 
         self._cnt += 1
 
-        return {"actor_loss": np.mean(actor_losses), "critic_loss": np.mean(critic_losses)}
+        return {
+            "actor_loss": np.mean(actor_losses),
+            "critic_loss": np.mean(critic_losses),
+        }

@@ -115,9 +115,7 @@ def do_train(config):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        "GAIfO for single agent environments"
-    )
+    parser = argparse.ArgumentParser("GAIfO for single agent environments")
     parser.add_argument(
         "--exp_config",
         "-e",

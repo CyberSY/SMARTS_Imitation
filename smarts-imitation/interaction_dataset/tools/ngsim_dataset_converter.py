@@ -37,11 +37,15 @@ def cal_heading(prev_pos, cur_pos, next_pos):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser("NGSIM-dataset-converter")
     parser.add_argument(
-        "input", help="Original dataset in csv format", type=str,
+        "input",
+        help="Original dataset in csv format",
+        type=str,
     )
 
     parser.add_argument(
-        "output", help="History file in JSON format", type=str,
+        "output",
+        help="History file in JSON format",
+        type=str,
     )
 
     args = parser.parse_args()
