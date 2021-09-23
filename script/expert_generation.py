@@ -11,15 +11,18 @@ from smarts_imitation.utils import adapter
 from smarts_imitation.utils import agent
 from smarts.core.utils.math import radians_to_vec
 
-def Accleration_count(obs,obs_next):
-    for (car, car_obs),(car_,car_obs_next) in zip(obs.items(),obs_next.items()):
-        car_state = car_obs.ego_vehicle_state
-        car_next_state = car_obs_next.ego_vehicle_state
+
+def Accleration_count(obs, obs_next):
+    for car in obs.keys():
+        if car not in obs_next.keys():
+            continue
+        car_state = obs[car].ego_vehicle_state
+        car_next_state = obs_next[car].ego_vehicle_state
         heading_vector = radians_to_vec(car_state.heading)
-        acc_scalar = car_state.linear_acceleration[:2].dot(heading_vector)
+        acc_scalar = car_next_state.linear_acceleration[:2].dot(heading_vector)
         acc_cal = (car_next_state.speed - car_state.speed) / 0.1
-        acc_sq = pow((car_state.linear_acceleration[0] ** 2 + car_state.linear_acceleration[1] ** 2),0.5)
-        print("{} | {} | {}".format(acc_scalar,acc_cal,acc_sq))
+        print("{} | {}".format(acc_scalar, acc_cal))
+
 
 #    for car in cars_obs:
 #        cars_obs[car] = np.array(cars_obs[car])
@@ -27,8 +30,6 @@ def Accleration_count(obs,obs_next):
 #        cars_obs[car] = cars_obs[car][:-1, :]
 #        acc_cal = (cars_obs[car]["speed"] - cars_obs[car]["speed"]) / 0.1
 #        Acc2.append(cars_obs[car]["speed"])
-
-    
 
 
 def main(scenarios):
@@ -73,6 +74,7 @@ def main(scenarios):
     prev_vehicles = set()
     done_vehicles = set()
     Time_counter = 0
+    prev_obs = None
     while True:
         Time_counter += 1
         smarts.step({})
@@ -94,9 +96,11 @@ def main(scenarios):
         for v in done_vehicles:
             cars_terminals[f"Agent-{v}"][-1] = True
             print(f"Agent-{v} Ended")
+
         if Time_counter >= 2:
-            Accleration_count(obs_save,obs)
-        obs_save = copy.copy(obs)
+            Accleration_count(prev_obs, obs)
+        prev_obs = copy.copy(obs)
+
         for k in obs.keys():
             obs[k] = observation_adapter(obs[k])
 
@@ -121,7 +125,6 @@ def main(scenarios):
             else:
                 cars_obs[car] = [full_obs]
                 cars_terminals[car] = [dones[car]]
-  
 
     for car in cars_obs:
         cars_obs[car] = np.array(cars_obs[car])
