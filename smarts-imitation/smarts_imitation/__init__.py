@@ -1,5 +1,7 @@
-from gym.envs.registration import register
 import os
+import numpy as np
+
+from gym.envs.registration import register
 
 register(
     id="SMARTS-Imitation-v0",
@@ -10,6 +12,12 @@ register(
                 os.path.dirname(__file__),
                 "../interaction_dataset/scenarios/interaction_dataset_merging",
             )
-        ]
+        ],
+        action_range=np.array(
+            [
+                [-2, -0.1],
+                [2, 0.1],
+            ]
+        ),
     ),
 )

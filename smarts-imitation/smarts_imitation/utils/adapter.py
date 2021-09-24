@@ -50,4 +50,5 @@ def get_action_adapter():
     def action_adapter(model_action):
         assert len(model_action) == 2
         return (model_action[0], model_action[1])
+
     return action_adapter

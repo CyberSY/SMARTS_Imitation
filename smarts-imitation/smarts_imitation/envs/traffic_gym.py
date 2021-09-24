@@ -10,7 +10,7 @@ from smarts_imitation.utils import agent
 
 
 class SMARTSImitation(gym.Env):
-    def __init__(self, scenarios):
+    def __init__(self, scenarios, action_range):
         super(SMARTSImitation, self).__init__()
         self.scenarios_iterator = Scenario.scenario_variations(scenarios, [])
         self._next_scenario()
@@ -20,6 +20,11 @@ class SMARTSImitation(gym.Env):
         self.action_space = gym.spaces.Box(
             low=np.array([-1.0, -1.0]), high=np.array([1.0, 1.0]), dtype=np.float32
         )
+
+        assert (
+            action_range.shape == (2, 2) and (action_range[1] >= action_range[0]).all()
+        ), action_range
+        self._action_range = action_range  # np.array([[low], [high]])
 
         self.smarts = SMARTS(
             agent_interfaces={},
@@ -47,6 +52,14 @@ class SMARTSImitation(gym.Env):
         return full_obs
 
     def step(self, action):
+        action = np.clip(action, -1, 1)
+        # Transform the normalized action back to the original range
+        # *** Formula for transformation from x in [xmin, xmax] to [ymin, ymax]
+        # *** y = (ymax - ymin) * (x - xmin) / (xmax - xmin) + ymin
+        action = (self._action_range[1] - self._action_range[0]) * (
+            action + 1
+        ) / 2 + self._action_range[0]
+
         observations, rewards, dones, infos = self.smarts.step(
             {self.vehicle_id: self.agent_spec.action_adapter(action)}
         )

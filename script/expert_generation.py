@@ -2,12 +2,34 @@ from smarts.core.smarts import SMARTS
 from smarts.core.sumo_traffic_simulation import SumoTrafficSimulation
 from envision.client import Client as Envision
 from smarts.core.scenario import Scenario
+import copy
 import numpy as np
 import pickle
 import argparse
 
 from smarts_imitation.utils import adapter
 from smarts_imitation.utils import agent
+from smarts.core.utils.math import radians_to_vec
+
+
+def Accleration_count(obs, obs_next):
+    for car in obs.keys():
+        if car not in obs_next.keys():
+            continue
+        car_state = obs[car].ego_vehicle_state
+        car_next_state = obs_next[car].ego_vehicle_state
+        heading_vector = radians_to_vec(car_state.heading)
+        acc_scalar = car_next_state.linear_acceleration[:2].dot(heading_vector)
+        acc_cal = (car_next_state.speed - car_state.speed) / 0.1
+        print("{} | {}".format(acc_scalar, acc_cal))
+
+
+#    for car in cars_obs:
+#        cars_obs[car] = np.array(cars_obs[car])
+#        cars_obs_next[car] = cars_obs[car][1:, :]
+#        cars_obs[car] = cars_obs[car][:-1, :]
+#        acc_cal = (cars_obs[car]["speed"] - cars_obs[car]["speed"]) / 0.1
+#        Acc2.append(cars_obs[car]["speed"])
 
 
 def main(scenarios):
@@ -51,7 +73,10 @@ def main(scenarios):
 
     prev_vehicles = set()
     done_vehicles = set()
+    Time_counter = 0
+    prev_obs = None
     while True:
+        Time_counter += 1
         smarts.step({})
 
         current_vehicles = smarts.vehicle_index.social_vehicle_ids()
@@ -71,6 +96,10 @@ def main(scenarios):
         for v in done_vehicles:
             cars_terminals[f"Agent-{v}"][-1] = True
             print(f"Agent-{v} Ended")
+
+        if Time_counter >= 2:
+            Accleration_count(prev_obs, obs)
+        prev_obs = copy.copy(obs)
 
         for k in obs.keys():
             obs[k] = observation_adapter(obs[k])
