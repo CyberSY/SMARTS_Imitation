@@ -1,6 +1,5 @@
 from smarts_imitation.utils import common
 import gym
-import numpy as np
 
 
 def get_observation_adapter(obs_stack_size):
@@ -11,13 +10,13 @@ def get_observation_adapter(obs_stack_size):
     observe_lane_num = 3
 
     subscribed_features = dict(
-        distance_to_center=(stack_size, 1),
-        speed=(stack_size, 1),
+        # distance_to_center=(stack_size, 1),
         ego_pos=(stack_size, 2),
-        # heading_errors=(stack_size, look_ahead),
-        neighbor=(stack_size, closest_neighbor_num * 5),  # dist, speed, ttc
-        # steering=(stack_size, 1),
         heading=(stack_size, 1),
+        speed=(stack_size, 1),
+        neighbor=(stack_size, closest_neighbor_num * 4),  # dist, speed, ttc
+        # heading_errors=(stack_size, look_ahead),
+        # steering=(stack_size, 1),
         # ego_lane_dist_and_speed=(stack_size, observe_lane_num + 1),
         # img_gray=(stack_size, img_resolution, img_resolution) if use_rgb else False,
     )

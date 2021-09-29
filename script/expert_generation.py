@@ -74,7 +74,7 @@ def main(scenarios):
     prev_vehicles = set()
     done_vehicles = set()
     Time_counter = 0
-    prev_obs = None
+    # prev_obs = None
     while True:
         Time_counter += 1
         smarts.step({})
@@ -97,9 +97,9 @@ def main(scenarios):
             cars_terminals[f"Agent-{v}"][-1] = True
             print(f"Agent-{v} Ended")
 
-        if Time_counter >= 2:
-            Accleration_count(prev_obs, obs)
-        prev_obs = copy.copy(obs)
+        # if Time_counter >= 2:
+        #     Accleration_count(prev_obs, obs)
+        # prev_obs = copy.copy(obs)
 
         for k in obs.keys():
             obs[k] = observation_adapter(obs[k])
@@ -138,9 +138,9 @@ def main(scenarios):
     with open("expert.pkl", "wb") as f:
         pickle.dump(
             {
-                "observation": expert_obs,
-                "next_observation": expert_obs_next,
-                "done": expert_terminals,
+                "observations": expert_obs,
+                "next_observations": expert_obs_next,
+                "terminals": expert_terminals,
             },
             f,
         )

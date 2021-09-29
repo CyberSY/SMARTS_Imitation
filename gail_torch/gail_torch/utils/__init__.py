@@ -6,6 +6,7 @@ from gail_torch.utils.tools import (
     make_env,
     flat_dict_to_episode,
     generate_tune_config,
+    obs_normalizer,
 )
 from gail_torch.utils.math import normal_log_density
 

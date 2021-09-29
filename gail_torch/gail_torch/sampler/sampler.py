@@ -3,6 +3,8 @@ import torch
 import numpy as np
 import multiprocessing
 
+from gail_torch.utils import obs_normalizer
+
 
 def collect_samples(
     pid,
@@ -34,7 +36,8 @@ def collect_samples(
 
         for t in range(10000):
             with torch.no_grad():
-                action, agent_info = policy.get_action(obs)
+                norm_obs = obs_normalizer(obs)
+                action, agent_info = policy.get_action(norm_obs)
             action = action.cpu().numpy()
             for k in agent_info.keys():
                 agent_info[k] = agent_info[k].cpu().numpy()

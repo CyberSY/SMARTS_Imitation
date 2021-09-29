@@ -8,7 +8,7 @@ from typing import Any, Dict, List, Tuple, Union, Optional, Callable
 
 from gail_torch.policy import BasePolicy
 from gail_torch.model import continuous_actor, continuous_critic
-from gail_torch.utils import estimate_advantages
+from gail_torch.utils import estimate_advantages, obs_normalizer
 
 
 class PPOPolicy(BasePolicy):
@@ -55,9 +55,9 @@ class PPOPolicy(BasePolicy):
     def update(self, memory):
         batch = memory.collect()
 
-        obs = torch.from_numpy(batch["observation"]).to(self.device, torch.float)
+        obs = torch.from_numpy(obs_normalizer(batch["observation"])).to(self.device, torch.float)
         act = torch.from_numpy(batch["action"]).to(self.device, torch.int64)
-        next_obs = torch.from_numpy(batch["next_observation"]).to(
+        next_obs = torch.from_numpy(obs_normalizer(batch["next_observation"])).to(
             self.device, torch.float
         )
         done = torch.tensor(batch["done"], dtype=torch.float, device=self.device)

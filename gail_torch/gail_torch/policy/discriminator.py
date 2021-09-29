@@ -5,6 +5,7 @@ from abc import ABC
 import torch.nn.functional as F
 
 from gail_torch.model import discriminator_net
+from gail_torch.utils import obs_normalizer
 
 
 class Discriminator(ABC, nn.Module):
@@ -61,11 +62,11 @@ class Discriminator(ABC, nn.Module):
         ), "expert dataset must be larger than batch size"
         expert_batch = expert_memory.sample(batch_size)
 
-        agent_obs = torch.from_numpy(agent_batch["observation"]).to(
+        agent_obs = torch.from_numpy(obs_normalizer(agent_batch["observation"])).to(
             self.device, torch.float
         )
         if self.state_only:
-            agent_next_obs = torch.from_numpy(agent_batch["next_observation"]).to(
+            agent_next_obs = torch.from_numpy(obs_normalizer(agent_batch["next_observation"])).to(
                 self.device, torch.float
             )
             agent_input = torch.cat([agent_obs, agent_next_obs], dim=-1)
@@ -76,11 +77,11 @@ class Discriminator(ABC, nn.Module):
             agent_input = torch.cat([agent_obs, agent_act], dim=-1)
         agent_prob = self.discriminator(agent_input)
 
-        expert_obs = torch.from_numpy(expert_batch["observation"]).to(
+        expert_obs = torch.from_numpy(obs_normalizer(expert_batch["observation"])).to(
             self.device, torch.float
         )
         if self.state_only:
-            expert_next_obs = torch.from_numpy(expert_batch["next_observation"]).to(
+            expert_next_obs = torch.from_numpy(obs_normalizer(expert_batch["next_observation"])).to(
                 self.device, torch.float
             )
             expert_input = torch.cat([expert_obs, expert_next_obs], dim=1)
