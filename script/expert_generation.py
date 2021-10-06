@@ -1,6 +1,4 @@
 from smarts.core.smarts import SMARTS
-from smarts.core.sumo_traffic_simulation import SumoTrafficSimulation
-from envision.client import Client as Envision
 from smarts.core.scenario import Scenario
 import copy
 import numpy as np
@@ -12,24 +10,35 @@ from smarts_imitation.utils import agent
 from smarts.core.utils.math import radians_to_vec
 
 
-def Accleration_count(obs, obs_next):
+def acceleration_count(obs, obs_next, acc_dict, ang_v_dict, avg_dis_dict):
+    acc_dict = {}
+    for car in obs.keys():
+        car_state = obs[car].ego_vehicle_state
+        angular_velocity = car_state.yaw_rate
+        ang_v_dict.append(angular_velocity)
+        dis_cal = car_state.speed * 0.1
+        if car in avg_dis_dict:
+            avg_dis_dict[car] += dis_cal
+        else:
+            avg_dis_dict[car] = dis_cal
+        if car not in obs_next.keys():
+            continue
+        car_next_state = obs_next[car].ego_vehicle_state
+        acc_cal = (car_next_state.speed - car_state.speed) / 0.1
+        acc_dict.append(acc_cal)
+
+
+def cal_action(obs, obs_next, dt=0.1):
+    act = {}
     for car in obs.keys():
         if car not in obs_next.keys():
             continue
         car_state = obs[car].ego_vehicle_state
         car_next_state = obs_next[car].ego_vehicle_state
-        heading_vector = radians_to_vec(car_state.heading)
-        acc_scalar = car_next_state.linear_acceleration[:2].dot(heading_vector)
-        acc_cal = (car_next_state.speed - car_state.speed) / 0.1
-        print("{} | {}".format(acc_scalar, acc_cal))
-
-
-#    for car in cars_obs:
-#        cars_obs[car] = np.array(cars_obs[car])
-#        cars_obs_next[car] = cars_obs[car][1:, :]
-#        cars_obs[car] = cars_obs[car][:-1, :]
-#        acc_cal = (cars_obs[car]["speed"] - cars_obs[car]["speed"]) / 0.1
-#        Acc2.append(cars_obs[car]["speed"])
+        acceleration = (car_next_state.speed - car_state.speed) / dt
+        angular_velocity = car_state.yaw_rate
+        act[car] = np.array([acceleration, angular_velocity])
+    return act
 
 
 def main(scenarios):
@@ -54,8 +63,6 @@ def main(scenarios):
     smarts = SMARTS(
         agent_interfaces={},
         traffic_sim=None,
-        # traffic_sim=SumoTrafficSimulation(headless=True, auto_start=True),
-        # envision=Envision(),
     )
     scenarios_iterator = Scenario.scenario_variations(
         [scenarios],
@@ -65,18 +72,18 @@ def main(scenarios):
     smarts.reset(next(scenarios_iterator))
 
     expert_obs = []
+    expert_acts = []
     expert_obs_next = []
     expert_terminals = []
     cars_obs = {}
+    cars_act = {}
     cars_obs_next = {}
     cars_terminals = {}
 
     prev_vehicles = set()
     done_vehicles = set()
-    Time_counter = 0
-    prev_obs = None
+    raw_prev_obs = None
     while True:
-        Time_counter += 1
         smarts.step({})
 
         current_vehicles = smarts.vehicle_index.social_vehicle_ids()
@@ -89,7 +96,7 @@ def main(scenarios):
         smarts.attach_sensors_to_vehicles(
             agent_spec, smarts.vehicle_index.social_vehicle_ids()
         )
-        obs, _, _, dones = smarts.observe_from(
+        raw_obs, _, _, dones = smarts.observe_from(
             smarts.vehicle_index.social_vehicle_ids()
         )
 
@@ -97,15 +104,22 @@ def main(scenarios):
             cars_terminals[f"Agent-{v}"][-1] = True
             print(f"Agent-{v} Ended")
 
-        if Time_counter >= 2:
-            Accleration_count(prev_obs, obs)
-        prev_obs = copy.copy(obs)
+        # handle actions
+        if raw_prev_obs is not None:
+            act = cal_action(raw_prev_obs, raw_obs)
+            for car in act.keys():
+                if cars_act.__contains__(car):
+                    cars_act[car].append(act[car])
+                else:
+                    cars_act[car] = [act[car]]
+        raw_prev_obs = copy.copy(raw_obs)
 
-        for k in obs.keys():
-            obs[k] = observation_adapter(obs[k])
+        obs = {}
+        for k in raw_obs.keys():
+            obs[k] = observation_adapter(raw_obs[k])
 
+        # handle observations
         cars = obs.keys()
-
         for car in cars:
             full_obs = []
             ego_state = []
@@ -130,17 +144,20 @@ def main(scenarios):
         cars_obs[car] = np.array(cars_obs[car])
         cars_obs_next[car] = cars_obs[car][1:, :]
         cars_obs[car] = cars_obs[car][:-1, :]
+        cars_act[car] = np.array(cars_act[car])
         cars_terminals[car] = np.array(cars_terminals[car][:-1])
         expert_obs.append(cars_obs[car])
+        expert_acts.append(cars_act[car])
         expert_obs_next.append(cars_obs_next[car])
         expert_terminals.append(cars_terminals[car])
 
     with open("expert.pkl", "wb") as f:
         pickle.dump(
             {
-                "observation": expert_obs,
-                "next_observation": expert_obs_next,
-                "done": expert_terminals,
+                "observations": expert_obs,
+                "actions": expert_acts,
+                "next_observations": expert_obs_next,
+                "terminals": expert_terminals,
             },
             f,
         )

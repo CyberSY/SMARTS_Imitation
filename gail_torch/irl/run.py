@@ -110,8 +110,12 @@ def do_train(config):
             print("=model saved at episode {}".format(update_cnt))
 
         memory, _ = sampler.collect_samples(config["exp_params"]["update_timestep"])
-        policy.update(memory)
-        discriminator.update(memory)
+        policy_losses = policy.update(memory)
+        discriminator_losses = discriminator.update(memory)
+
+        for name, loss_value in {**policy_losses, **discriminator_losses}.items():
+            print(f"{name}: {loss_value} ", end="")
+        print("")
 
 
 if __name__ == "__main__":

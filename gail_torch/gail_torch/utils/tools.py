@@ -112,3 +112,14 @@ def _merge_variable_to_config(config, variable):
         else:
             raise RuntimeError("The variable part of tune config file is broken.")
     return config
+
+
+OBS_MAX = np.tile(np.array([1138, 971, 1.95, 25.0]), 7)
+OBS_MIN = np.tile(np.array([1005, 938, -1.85, 0.0]), 7)
+
+
+def obs_normalizer(obs):
+    # *** Formula for transformation from x in [xmin, xmax] to [ymin, ymax]
+    # *** y = (ymax - ymin) * (x - xmin) / (xmax - xmin) + ymin
+    norm_obs = 2 * (obs - OBS_MIN) / (OBS_MAX - OBS_MIN) + -1
+    return norm_obs

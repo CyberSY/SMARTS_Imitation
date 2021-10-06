@@ -50,7 +50,6 @@ SPACE_LIB = dict(
     heading_errors=lambda shape: gym.spaces.Box(low=-1.0, high=1.0, shape=shape),
     speed=lambda shape: gym.spaces.Box(low=-330.0, high=330.0, shape=shape),
     steering=lambda shape: gym.spaces.Box(low=-1.0, high=1.0, shape=shape),
-    goal_relative_pos=lambda shape: gym.spaces.Box(low=-1e2, high=1e2, shape=shape),
     neighbor=lambda shape: gym.spaces.Box(low=-1e3, high=1e3, shape=shape),
     ego_pos=lambda shape: gym.spaces.Box(low=-1e3, high=1e3, shape=shape),
     heading=lambda shape: gym.spaces.Box(low=-1e3, high=1e3, shape=shape),
@@ -94,31 +93,7 @@ def _get_closest_vehicles(ego, neighbor_vehicles, n):
     return groups
 
 
-class ActionSpace:
-    @staticmethod
-    def from_type(action_type: int):
-        space_type = ActionSpaceType(action_type)
-        if space_type == ActionSpaceType.Continuous:
-            return gym.spaces.Box(
-                low=np.array([0.0, 0.0, -1.0]),
-                high=np.array([1.0, 1.0, 1.0]),
-                dtype=np.float32,
-            )
-        elif space_type == ActionSpaceType.Lane:
-            return gym.spaces.Discrete(4)
-        else:
-            raise NotImplementedError
-
-
 class CalObs:
-    @staticmethod
-    def cal_goal_relative_pos(env_obs: Observation, **kwargs):
-        ego_pos = env_obs.ego_vehicle_state.position[:2]
-        goal_pos = env_obs.goal.position
-
-        vector = np.asarray([goal_pos[0] - ego_pos[0], goal_pos[1] - ego_pos[1]])
-        space = SPACE_LIB["goal_relative_pos"](vector.shape)
-        return vector / (space.high - space.low)
 
     @staticmethod
     def cal_ego_pos(env_obs: Observation, **kwargs):
@@ -126,7 +101,7 @@ class CalObs:
 
     @staticmethod
     def cal_heading(env_obs: Observation, **kwargs):
-        return float(env_obs.ego_vehicle_state.heading)
+        return np.asarray(float(env_obs.ego_vehicle_state.heading))
 
     @staticmethod
     def cal_distance_to_center(env_obs: Observation, **kwargs):
@@ -173,9 +148,7 @@ class CalObs:
     def cal_speed(env_obs: Observation, **kwargs):
         ego = env_obs.ego_vehicle_state
         res = np.asarray([ego.speed])
-        # space = SPACE_LIB["speed"](res.shape)
-        # return (res - space.low) / (space.high - space.low)
-        return res / 120.0
+        return res
 
     @staticmethod
     def cal_steering(env_obs: Observation, **kwargs):
@@ -188,67 +161,23 @@ class CalObs:
         neighbor_vehicle_states = env_obs.neighborhood_vehicle_states
         closest_neighbor_num = kwargs.get("closest_neighbor_num", 8)
         # dist, speed, ttc, pos
-        features = np.zeros((closest_neighbor_num, 5))
+        features = np.zeros((closest_neighbor_num, 4))
         # fill neighbor vehicles into closest_neighboor_num areas
         surrounding_vehicles = _get_closest_vehicles(
             ego, neighbor_vehicle_states, n=closest_neighbor_num
         )
-        # ego vehicle的角向量：@jiayu说车辆的heading零度角是正北，而地图是正东，
-        # 所以要90度修正
-        heading_angle = math.radians(ego.heading + 90.0)
-        ego_heading_vec = np.asarray([math.cos(heading_angle), math.sin(heading_angle)])
         for i, v in surrounding_vehicles.items():
             if v[0] is None:
-                continue
-            v = v[0]
-            rel_pos = np.asarray(
-                list(map(lambda x: x[0] - x[1], zip(v.position[:2], ego.position[:2])))
-            )
-
-            # 相对位移
-            rel_dist = np.sqrt(rel_pos.dot(rel_pos))
-            # 计算相对速度
-            v_heading_angle = math.radians(v.heading)
-            v_heading_vec = np.asarray(
-                [math.cos(v_heading_angle), math.sin(v_heading_angle)]
-            )
-
-            ego_heading_norm_2 = ego_heading_vec.dot(ego_heading_vec)
-            rel_pos_norm_2 = rel_pos.dot(rel_pos)
-            v_heading_norm_2 = v_heading_vec.dot(v_heading_vec)
-            # 计算ego的方向夹角cosin
-            ego_cosin = ego_heading_vec.dot(rel_pos) / np.sqrt(
-                ego_heading_norm_2 + rel_pos_norm_2
-            )
-            # 计算neighbor的方向夹角cosin
-            v_cosin = v_heading_vec.dot(rel_pos) / np.sqrt(
-                v_heading_norm_2 + rel_pos_norm_2
-            )
-            # 计算neighbor速度在我车头方向上的投影比，不用
-            # cosin_on_my_vec = v_heading_vec.dot(ego_heading_vec) / np.sqrt(ego_heading_norm_2 + v_heading_norm_2)
-
-            # 相对速度：沿着相对位移方向
-            rel_speed = 0
-            if ego_cosin <= 0 and v_cosin > 0:
-                rel_speed = 0
+                v = ego
             else:
-                rel_speed = ego.speed * ego_cosin - v.speed * v_cosin
+                v = v[0]
 
-            ttc = min(rel_dist / max(1e-5, rel_speed), 1e3)
+            pos = v.position[:2]
+            heading = np.asarray(float(v.heading))
+            speed = np.asarray(v.speed)
 
-            # if ego_cosin >= 0:  # neighbor在前，考虑撞车
-            #     if v_cosin <= 0:  # 对向行驶, consin_on_my_vec <= 0
-            # rel_speed = ego_speed * ego_cosin - v_speed * v_cosin
-            #     else:
-            #         rel_speed = ego_speed * ego_cosin - v_speed * cosin_on_my_vec
-            # else:  # neighbor在后，考虑追车
-            #     if v_cosin <= 0:  # neighbor和我同向行驶
-            #         # ego_speed - v_speed * cosin_on my vec
-            #         rel_speed = ego_speed - v_speed * cosin_on_my_vec
-            #     else: # 跟我反向行驶
-            #         rel_speed = 0
             features[i, :] = np.asarray(
-                [rel_dist, rel_speed, ttc, rel_pos[0], rel_pos[1]]
+                [pos[0], pos[1], heading, speed]
             )
 
         return features.reshape((-1,))
@@ -355,28 +284,6 @@ class CalObs:
             / 255.0
         )
         return gray_scale
-
-
-class ActionAdapter:
-    @staticmethod
-    def from_type(action_type):
-        space_type = ActionSpaceType(action_type)
-        if space_type == ActionSpaceType.Continuous:
-            return ActionAdapter.continuous_action_adapter
-        elif space_type == ActionSpaceType.Lane:
-            return ActionAdapter.discrete_action_adapter
-        else:
-            raise NotImplementedError
-
-    @staticmethod
-    def continuous_action_adapter(model_action):
-        assert len(model_action) == 3
-        return np.asarray(model_action)
-
-    @staticmethod
-    def discrete_action_adapter(model_action):
-        assert model_action in [0, 1, 2, 3]
-        return model_action
 
 
 def _update_obs_by_item(
