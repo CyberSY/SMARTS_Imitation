@@ -1,0 +1,17 @@
+meta_data:
+  script_path: run_scripts/gen_smarts_demos.py
+  exp_name: gen_smarts_demos_interaction_dataset
+  description: Generate demonstrations for imitation learning algorithms
+  num_workers: 1
+  using_gpus: true
+# -----------------------------------------------------------------------------
+variables: {}
+
+# -----------------------------------------------------------------------------
+constants:
+
+  env_specs:
+    env_creator: "smarts"
+    scenario_name: "interaction_dataset"
+    scenario_path: "/NAS2020/Workspaces/DRLGroup/zbzhu/SMARTS_Imitation/smarts-imitation/interaction_dataset/scenarios/interaction_dataset_merging"
+    env_kwargs: {}

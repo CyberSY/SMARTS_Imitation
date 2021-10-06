@@ -1,0 +1,11 @@
+smarts_interaction_dataset:
+  decription: "Interaction Dataset Merging, SMARTS"
+  file_paths: [
+    ./demos/smarts_interaction_dataset.pkl
+  ]
+
+smarts_ngsim:
+  description: "NGSIM, SMARTS"
+  file_paths: [
+    ./demos/smarts_ngsim.pkl
+  ]

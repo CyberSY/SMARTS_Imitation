@@ -16,9 +16,9 @@ class SMARTSImitation(gym.Env):
         self._next_scenario()
         self.obs_stacked_size = 1
         self.agent_spec = agent.get_agent_spec(self.obs_stacked_size)
-        self.observation_space = gym.spaces.Box(low=-np.inf, high=np.inf, shape=(28,))
+        self.observation_space = gym.spaces.Box(low=-np.inf, high=np.inf, shape=(28,), dtype=np.float64)
         self.action_space = gym.spaces.Box(
-            low=np.array([-1.0, -1.0]), high=np.array([1.0, 1.0]), dtype=np.float32
+            low=np.array([-1.0, -1.0]), high=np.array([1.0, 1.0]), dtype=np.float64
         )
 
         assert (
@@ -35,17 +35,17 @@ class SMARTSImitation(gym.Env):
     def seed(self, seed):
         np.random.seed(seed)
 
-    def _convert_obs(self, observations):
-        observations[self.vehicle_id] = self.agent_spec.observation_adapter(
-            observations[self.vehicle_id]
+    def _convert_obs(self, raw_observations):
+        observation = self.agent_spec.observation_adapter(
+            raw_observations[self.vehicle_id]
         )
         ego_state = []
         other_info = []
-        for feat in observations[self.vehicle_id]:
+        for feat in observation:
             if feat in ["ego_pos", "speed", "heading"]:
-                ego_state.append(observations[self.vehicle_id][feat])
+                ego_state.append(observation[feat])
             else:
-                other_info.append(observations[self.vehicle_id][feat])
+                other_info.append(observation[feat])
         ego_state = np.concatenate(ego_state, axis=1).reshape(-1)
         other_info = np.concatenate(other_info, axis=1).reshape(-1)
         full_obs = np.concatenate((ego_state, other_info))
@@ -60,15 +60,20 @@ class SMARTSImitation(gym.Env):
             action + 1
         ) / 2 + self._action_range[0]
 
-        observations, rewards, dones, infos = self.smarts.step(
+        raw_observations, rewards, dones, _ = self.smarts.step(
             {self.vehicle_id: self.agent_spec.action_adapter(action)}
         )
-        full_obs = self._convert_obs(observations)
+        full_obs = self._convert_obs(raw_observations)
+
+        info = {}
+        info["reached_goal"] = raw_observations[self.vehicle_id].events.reached_goal
+        info["collision"] = len(raw_observations[self.vehicle_id].events.collisions) > 0
+
         return (
             full_obs,
             rewards[self.vehicle_id],
             dones[self.vehicle_id],
-            {},
+            info,
         )
 
     def reset(self):

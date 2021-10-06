@@ -1,7 +1,10 @@
+demos/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
+*.py.swp
 
 # C extensions
 *.so
@@ -130,15 +133,10 @@ dmypy.json
 
 # Workspace
 .vscode
-_run_logs
-results
-supervisord.log
-supervisord.pid
-xdummy.log
-xdummy.log.old
-xorg.sh
-.nfs*
-assets/
-*.pkl
-original/
-*.shf
+.idea
+.DS_Store
+config.py
+logs
+output
+demos
+reference_repos
