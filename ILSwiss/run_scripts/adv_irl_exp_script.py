@@ -159,7 +159,7 @@ def experiment(variant):
     env = env_wrapper(env, **kwargs)
 
     print("Creating {} training environments ...".format(env_specs["training_env_num"]))
-    training_env = get_envs(env_specs, env_wrapper, **kwargs)
+    training_env = get_envs(env_specs, env_wrapper, env_specs["training_env_num"],**kwargs)
     training_env.seed(env_specs["training_env_seed"])
 
     print("Creating {} evaluation environments ...".format(env_specs["eval_env_num"]))
