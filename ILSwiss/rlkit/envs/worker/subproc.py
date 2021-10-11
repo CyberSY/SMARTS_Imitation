@@ -163,6 +163,7 @@ class SubprocEnvWorker(EnvWorker):
         obs = self.parent_remote.recv()
         if self.share_memory:
             obs = self._decode_obs()
+        print('reset_obs: {}'.format(obs))
         return obs
 
     @staticmethod
