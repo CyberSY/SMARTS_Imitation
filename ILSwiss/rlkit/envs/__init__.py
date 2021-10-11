@@ -77,7 +77,8 @@ def get_envs(
         )
 
     else:
-        envs = SubprocVectorEnv(
+#        envs = SubprocVectorEnv(
+        envs = DummyVectorEnv(
             [
                 lambda: env_wrapper(env_class(**env_specs))
                 for _ in range(env_num)
