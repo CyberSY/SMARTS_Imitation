@@ -1,6 +1,6 @@
 meta_data:
   script_path: run_scripts/adv_irl_exp_script.py
-  exp_name: gail_smarts_interaction
+  exp_name: gailfo_smarts_ngsim
   description: Train an adversarial IRL model
   num_workers: 2 # 64
   using_gpus: true
@@ -10,12 +10,11 @@ variables:
     grad_pen_weight: [4.0] # [0.5, 1.0, 2.0, 4.0, 8.0, 16.0, 32.0, 64.0]
   sac_params:
     reward_scale: [2.0] # [0.5, 1.0, 2.0, 4.0, 8.0, 16.0, 32.0, 64.0]
-  # seed: [723894, 23789]
   seed: [723894]
 
 # -----------------------------------------------------------------------------
 constants:
-  expert_name: 'smarts_interaction_dataset'
+  expert_name: 'smarts_ngsim'
   expert_idx: 0
   traj_num: -1
   scale_env_with_demo_stats: false
@@ -43,7 +42,8 @@ constants:
     eval_deterministic: true
     num_steps_per_eval: 20000
     
-    replay_buffer_size: 200000
+    replay_buffer_size: 2000000
+    expert_buffer_size: 1000000
     no_terminal: false
     eval_no_terminal: false
     wrap_absorbing: false
@@ -81,9 +81,9 @@ constants:
 
   env_specs:
     env_creator: 'smarts'
-    scenario_name: 'interaction_dataset'
+    scenario_name: 'ngsim'
     env_kwargs: {}
-    training_env_num: 1
-    eval_env_num: 1
-    training_env_seed: 24495
-    eval_env_seed: 78236
+    training_env_num: 5
+    eval_env_num: 5
+    training_env_seed: 24491
+    eval_env_seed: 24492
