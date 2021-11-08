@@ -55,7 +55,7 @@ class DiscretePolicy(Mlp, ExplorationPolicy):
             output_size=action_dim,
             init_w=init_w,
             output_activation=nn.LogSoftmax(1),
-            **kwargs
+            **kwargs,
         )
 
     def get_action(self, obs_np, deterministic=False):
@@ -111,7 +111,7 @@ class MlpPolicy(Mlp, ExplorationPolicy):
             input_size=obs_dim,
             output_size=action_dim,
             init_w=init_w,
-            **kwargs
+            **kwargs,
         )
 
     def get_action(self, obs_np, deterministic=False):
@@ -137,7 +137,7 @@ class MlpGaussianNoisePolicy(Mlp, ExplorationPolicy):
         policy_noise=0.1,
         policy_noise_clip=0.5,
         max_act=1.0,
-        **kwargs
+        **kwargs,
     ):
         self.save_init_params(locals())
         super().__init__(
@@ -145,7 +145,7 @@ class MlpGaussianNoisePolicy(Mlp, ExplorationPolicy):
             input_size=obs_dim,
             output_size=action_dim,
             init_w=init_w,
-            **kwargs
+            **kwargs,
         )
         self.noise = policy_noise
         self.noise_clip = policy_noise_clip
@@ -215,7 +215,7 @@ class ReparamTanhMultivariateGaussianPolicy(Mlp, ExplorationPolicy):
         init_w=1e-3,
         max_act=1.0,
         conditioned_std: bool = False,
-        **kwargs
+        **kwargs,
     ):
         self.save_init_params(locals())
         super().__init__(
@@ -223,7 +223,7 @@ class ReparamTanhMultivariateGaussianPolicy(Mlp, ExplorationPolicy):
             input_size=obs_dim,
             output_size=action_dim,
             init_w=init_w,
-            **kwargs
+            **kwargs,
         )
         self.max_act = max_act
         self.conditioned_std = conditioned_std
@@ -361,7 +361,7 @@ class ReparamMultivariateGaussianPolicy(Mlp, ExplorationPolicy):
             input_size=obs_dim,
             output_size=action_dim,
             init_w=init_w,
-            **kwargs
+            **kwargs,
         )
         self.conditioned_std = conditioned_std
 

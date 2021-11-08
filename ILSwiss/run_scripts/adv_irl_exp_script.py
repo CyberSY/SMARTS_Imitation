@@ -64,7 +64,9 @@ def experiment(variant):
     print("Act Space: {}\n\n".format(env.action_space_n))
 
     expert_replay_buffer = EnvReplayBuffer(
-        variant["adv_irl_params"].get("expert_buffer_size", variant["adv_irl_params"]["replay_buffer_size"]),
+        variant["adv_irl_params"].get(
+            "expert_buffer_size", variant["adv_irl_params"]["replay_buffer_size"]
+        ),
         env,
         random_seed=np.random.randint(10000),
     )
@@ -75,7 +77,11 @@ def experiment(variant):
         expert_replay_buffer.add_path(
             traj_list[i], absorbing=variant["adv_irl_params"]["wrap_absorbing"], env=env
         )
-    print("Load {} trajectories, {} samples".format(len(traj_list), expert_replay_buffer.num_steps_can_sample()))
+    print(
+        "Load {} trajectories, {} samples".format(
+            len(traj_list), expert_replay_buffer.num_steps_can_sample()
+        )
+    )
 
     obs_space_n = env.observation_space_n
     act_space_n = env.action_space_n
@@ -140,7 +146,12 @@ def experiment(variant):
 
             # set up the algorithm
             trainer = SoftActorCritic(
-                policy=policy, qf1=qf1, qf2=qf2, vf=vf, action_space=env.action_space_n[agent_id], **variant["sac_params"]
+                policy=policy,
+                qf1=qf1,
+                qf2=qf2,
+                vf=vf,
+                action_space=env.action_space_n[agent_id],
+                **variant["sac_params"],
             )
 
             policy_trainer_n[policy_id] = trainer
@@ -159,11 +170,15 @@ def experiment(variant):
     env = env_wrapper(env, **kwargs)
 
     print("Creating {} training environments ...".format(env_specs["training_env_num"]))
-    training_env = get_envs(env_specs, env_wrapper, **kwargs)
+    training_env = get_envs(
+        env_specs, env_wrapper, env_num=env_specs["training_env_num"], **kwargs
+    )
     training_env.seed(env_specs["training_env_seed"])
 
     print("Creating {} evaluation environments ...".format(env_specs["eval_env_num"]))
-    eval_env = get_envs(env_specs, env_wrapper, env_num=env_specs["eval_env_num"])
+    eval_env = get_envs(
+        env_specs, env_wrapper, env_num=env_specs["eval_env_num"], **kwargs
+    )
     eval_env.seed(env_specs["eval_env_seed"])
 
     algorithm = AdvIRL(

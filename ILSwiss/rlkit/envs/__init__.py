@@ -78,10 +78,7 @@ def get_envs(
 
     else:
         envs = SubprocVectorEnv(
-            [
-                lambda: env_wrapper(env_class(**env_specs))
-                for _ in range(env_num)
-            ],
+            [lambda: env_wrapper(env_class(**env_specs)) for _ in range(env_num)],
             **kwargs,
         )
 

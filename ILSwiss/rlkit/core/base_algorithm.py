@@ -183,7 +183,10 @@ class BaseAlgorithm(metaclass=abc.ABCMeta):
                     ],
                 )
             )
-            for steps_this_epoch in tqdm(range(self.num_env_steps_per_epoch // self.env_num), unit_scale=self.env_num):
+            for steps_this_epoch in tqdm(
+                range(self.num_env_steps_per_epoch // self.env_num),
+                unit_scale=self.env_num,
+            ):
                 actions_n = self._get_action_and_info(observations_n)
 
                 for a_id in self.agent_ids:

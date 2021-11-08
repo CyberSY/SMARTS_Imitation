@@ -96,7 +96,9 @@ def experiment(variant):
     env = env_wrapper(env)
 
     print("Creating {} training environments ...".format(env_specs["training_env_num"]))
-    training_env = get_envs(env_specs, env_wrapper, env_num=env_specs["training_env_num"])
+    training_env = get_envs(
+        env_specs, env_wrapper, env_num=env_specs["training_env_num"]
+    )
     training_env.seed(env_specs["training_env_seed"])
 
     print("Creating {} evaluation environments ...".format(env_specs["eval_env_num"]))

@@ -54,9 +54,12 @@ class OptionPPO(Trainer):
         self.option_policy_optimizer = optimizer_class(
             self.policy.option_policy.parameters(), lr=option_lr, betas=(beta_1, 0.999)
         )
-        if isinstance(self.policy.action_log_std, nn.ParameterList):  # if the action_log_std is not shared and is a ParameterList
+        if isinstance(
+            self.policy.action_log_std, nn.ParameterList
+        ):  # if the action_log_std is not shared and is a ParameterList
             self.policy_optimizer = optimizer_class(
-                list(self.policy.policy.parameters()) + list(self.policy.action_log_std.parameters()),
+                list(self.policy.policy.parameters())
+                + list(self.policy.action_log_std.parameters()),
                 lr=policy_lr,
                 betas=(beta_1, 0.999),
             )

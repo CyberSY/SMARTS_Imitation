@@ -91,7 +91,11 @@ def _worker(
                     obs = None
                 p.send((obs, reward, done, info))
             elif cmd == "reset":
+                # try:
                 obs = env.reset()
+                # except Exception as e:
+                #     print("reset", e)
+                #     print(traceback.format_exc())
                 if obs_bufs is not None:
                     _encode_obs(obs, obs_bufs)
                     obs = None

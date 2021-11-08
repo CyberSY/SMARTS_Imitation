@@ -142,3 +142,6 @@ assets/
 *.pkl
 original/
 *.shf
+*.pth
+jidi_submission/
+ngsim_jidi/

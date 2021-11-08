@@ -181,15 +181,7 @@ class AgentOptionEnvReplayBuffer(AgentSimpleReplayBuffer):
             path["prev_options"] = [None] * len(path["observations"])
         if "options" not in path.keys():
             path["options"] = [None] * len(path["observations"])
-        for (
-            ob,
-            action,
-            reward,
-            next_ob,
-            terminal,
-            prev_option,
-            option,
-        ) in zip(
+        for (ob, action, reward, next_ob, terminal, prev_option, option,) in zip(
             path["observations"],
             path["actions"],
             path["rewards"],

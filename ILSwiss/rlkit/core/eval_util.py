@@ -33,15 +33,20 @@ def get_generic_path_information(paths, stat_prefix=""):
 
     # driving scenarios specific metrics
     distance_travelled_n = {
-        a_id: [abs(path[a_id]["observations"][-1][0] - path[a_id]["observations"][0][0]) for path in paths]
+        a_id: [
+            abs(path[a_id]["observations"][-1][0] - path[a_id]["observations"][0][0])
+            for path in paths
+        ]
         for a_id in agent_ids
     }
     success_rate_n = {
-        a_id: float(sum(path[a_id]["env_infos"][-1]["reached_goal"] for path in paths)) / len(paths)
+        a_id: float(sum(path[a_id]["env_infos"][-1]["reached_goal"] for path in paths))
+        / len(paths)
         for a_id in agent_ids
     }
     collision_rate_n = {
-        a_id: float(sum(path[a_id]["env_infos"][-1]["collision"] for path in paths)) / len(paths)
+        a_id: float(sum(path[a_id]["env_infos"][-1]["collision"] for path in paths))
+        / len(paths)
         for a_id in agent_ids
     }
 

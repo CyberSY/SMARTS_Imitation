@@ -51,7 +51,7 @@ class AdvIRL(TorchBaseAlgorithm):
         grad_pen_weight=10,
         rew_clip_min=None,
         rew_clip_max=None,
-        **kwargs
+        **kwargs,
     ):
         assert mode in [
             "airl",
@@ -74,8 +74,11 @@ class AdvIRL(TorchBaseAlgorithm):
         self.discriminator_n = discriminator_n
         self.disc_optimizer_n = {
             policy_id: disc_optimizer_class(
-                self.discriminator_n[policy_id].parameters(), lr=disc_lr, betas=(disc_momentum, 0.999)
-            ) for policy_id in self.policy_ids
+                self.discriminator_n[policy_id].parameters(),
+                lr=disc_lr,
+                betas=(disc_momentum, 0.999),
+            )
+            for policy_id in self.policy_ids
         }
 
         self.disc_optim_batch_size = disc_optim_batch_size
@@ -239,12 +242,16 @@ class AdvIRL(TorchBaseAlgorithm):
             self.disc_eval_statistics[f"{policy_id} Disc CE Loss"] = np.mean(
                 ptu.get_numpy(disc_ce_loss)
             )
-            self.disc_eval_statistics[f"{policy_id} Disc Acc"] = np.mean(ptu.get_numpy(accuracy))
+            self.disc_eval_statistics[f"{policy_id} Disc Acc"] = np.mean(
+                ptu.get_numpy(accuracy)
+            )
             if self.use_grad_pen:
                 self.disc_eval_statistics[f"{policy_id} Grad Pen"] = np.mean(
                     ptu.get_numpy(gradient_penalty)
                 )
-                self.disc_eval_statistics[f"{policy_id} Grad Pen W"] = np.mean(self.grad_pen_weight)
+                self.disc_eval_statistics[f"{policy_id} Grad Pen W"] = np.mean(
+                    self.grad_pen_weight
+                )
 
     def _do_policy_training(self, epoch, agent_id):
 
@@ -332,7 +339,10 @@ class AdvIRL(TorchBaseAlgorithm):
 
     @property
     def networks_n(self):
-        return {p_id: [self.discriminator_n[p_id]] + self.policy_trainer_n[p_id].networks for p_id in self.policy_ids}
+        return {
+            p_id: [self.discriminator_n[p_id]] + self.policy_trainer_n[p_id].networks
+            for p_id in self.policy_ids
+        }
 
     def get_epoch_snapshot(self, epoch):
         # snapshot = super().get_epoch_snapshot(epoch)

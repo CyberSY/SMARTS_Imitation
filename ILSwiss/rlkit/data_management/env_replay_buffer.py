@@ -42,9 +42,7 @@ class EnvReplayBuffer:
     def add_path(self, path_n, absorbing=False, env=None):
         for a_id in self.agent_ids:
             self.agent_buffers[a_id].add_path(
-                path_n[a_id],
-                absorbing=absorbing,
-                env=env
+                path_n[a_id], absorbing=absorbing, env=env
             )
 
     def add_sample(

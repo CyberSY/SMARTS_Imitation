@@ -94,7 +94,6 @@ def _get_closest_vehicles(ego, neighbor_vehicles, n):
 
 
 class CalObs:
-
     @staticmethod
     def cal_ego_pos(env_obs: Observation, **kwargs):
         return env_obs.ego_vehicle_state.position[:2]
@@ -176,9 +175,7 @@ class CalObs:
             heading = np.asarray(float(v.heading))
             speed = np.asarray(v.speed)
 
-            features[i, :] = np.asarray(
-                [pos[0], pos[1], heading, speed]
-            )
+            features[i, :] = np.asarray([pos[0], pos[1], heading, speed])
 
         return features.reshape((-1,))
 

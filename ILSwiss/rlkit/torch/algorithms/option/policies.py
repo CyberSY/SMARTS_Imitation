@@ -7,7 +7,10 @@ import torch.nn.functional as F
 
 from rlkit.policies.base import ExplorationPolicy
 from rlkit.torch.common.networks import Mlp
-from rlkit.torch.common.distributions import ReparamMultivariateNormalDiag, ReparamTanhMultivariateNormal
+from rlkit.torch.common.distributions import (
+    ReparamMultivariateNormalDiag,
+    ReparamTanhMultivariateNormal,
+)
 from rlkit.torch.core import PyTorchModule
 
 import rlkit.torch.utils.pytorch_util as ptu
@@ -52,7 +55,11 @@ class OptionPolicy(PyTorchModule, ExplorationPolicy):
                 **kwargs,
             )
             self.policy = Mlp(
-                hidden_sizes[1], option_dim * action_dim, obs_dim, init_w=init_w, **kwargs
+                hidden_sizes[1],
+                option_dim * action_dim,
+                obs_dim,
+                init_w=init_w,
+                **kwargs,
             )
             self.action_log_std = nn.Parameter(torch.zeros(1, action_dim))
         else:
@@ -81,12 +88,7 @@ class OptionPolicy(PyTorchModule, ExplorationPolicy):
                 ]
             )
             self.action_log_std = nn.ParameterList(
-                [
-                    nn.Parameter(
-                        torch.zeros(1, action_dim)
-                    )
-                    for _ in range(option_dim)
-                ]
+                [nn.Parameter(torch.zeros(1, action_dim)) for _ in range(option_dim)]
             )
 
     def forward(
@@ -193,7 +195,9 @@ class OptionPolicy(PyTorchModule, ExplorationPolicy):
 
     def switcher(self, obs):
         if self.share_option_nets:
-            return self.option_policy(obs).view(-1, self.option_dim + 1, self.option_dim)
+            return self.option_policy(obs).view(
+                -1, self.option_dim + 1, self.option_dim
+            )
         else:
             return torch.stack([m(obs) for m in self.option_policy], dim=-2)
 
@@ -357,7 +361,11 @@ class OptionTanhPolicy(PyTorchModule, ExplorationPolicy):
                 **kwargs,
             )
             self.policy = Mlp(
-                hidden_sizes[1], option_dim * action_dim, obs_dim, init_w=init_w, **kwargs
+                hidden_sizes[1],
+                option_dim * action_dim,
+                obs_dim,
+                init_w=init_w,
+                **kwargs,
             )
             self.action_log_std = nn.Parameter(torch.zeros(1, action_dim))
         else:
@@ -386,12 +394,7 @@ class OptionTanhPolicy(PyTorchModule, ExplorationPolicy):
                 ]
             )
             self.action_log_std = nn.ParameterList(
-                [
-                    nn.Parameter(
-                        torch.zeros(1, action_dim)
-                    )
-                    for _ in range(option_dim)
-                ]
+                [nn.Parameter(torch.zeros(1, action_dim)) for _ in range(option_dim)]
             )
 
     def forward(
@@ -501,7 +504,9 @@ class OptionTanhPolicy(PyTorchModule, ExplorationPolicy):
 
     def switcher(self, obs):
         if self.share_option_nets:
-            return self.option_policy(obs).view(-1, self.option_dim + 1, self.option_dim)
+            return self.option_policy(obs).view(
+                -1, self.option_dim + 1, self.option_dim
+            )
         else:
             return torch.stack([m(obs) for m in self.option_policy], dim=-2)
 
@@ -556,7 +561,9 @@ class OptionTanhPolicy(PyTorchModule, ExplorationPolicy):
         tanh_normal = ReparamTanhMultivariateNormal(mean, a_log_std)
         a_log_prob = tanh_normal.log_prob(acts)
 
-        entropy = (0.5 + 0.5 * math.log(2 * math.pi) + a_log_std).sum(dim=-1, keepdim=True)
+        entropy = (0.5 + 0.5 * math.log(2 * math.pi) + a_log_std).sum(
+            dim=-1, keepdim=True
+        )
         return a_log_prob, entropy
 
     def option_log_prob_entropy(self, obs, prev_option, option):

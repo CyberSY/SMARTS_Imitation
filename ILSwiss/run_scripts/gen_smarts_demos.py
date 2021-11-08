@@ -45,7 +45,9 @@ def calculate_actions(raw_observations, raw_next_observations, dt=0.1):
         if car not in raw_next_observations.keys():
             continue
         car_next_state = raw_next_observations[car].ego_vehicle_state
-        acceleration = car_next_state.linear_acceleration[:2].dot(radians_to_vec(car_next_state.heading))
+        acceleration = car_next_state.linear_acceleration[:2].dot(
+            radians_to_vec(car_next_state.heading)
+        )
         angular_velocity = car_next_state.yaw_rate
         actions[car] = np.array([acceleration, angular_velocity])
     return actions
@@ -86,7 +88,7 @@ def sample_demos(
     observations = observation_transform(raw_observations, observation_adapter)
 
     while True:
-        """ Step in the environment. """
+        """Step in the environment."""
         smarts.step({})
 
         current_vehicles = smarts.vehicle_index.social_vehicle_ids()
@@ -102,7 +104,9 @@ def sample_demos(
         raw_next_observations, _, _, dones = smarts.observe_from(
             smarts.vehicle_index.social_vehicle_ids()
         )
-        next_observations = observation_transform(raw_next_observations, observation_adapter)
+        next_observations = observation_transform(
+            raw_next_observations, observation_adapter
+        )
         actions = calculate_actions(raw_observations, raw_next_observations)
 
         """ Handle terminated vehicles. """

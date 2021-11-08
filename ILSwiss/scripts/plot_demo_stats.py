@@ -5,7 +5,7 @@ import inspect
 import argparse
 import matplotlib
 
-matplotlib.use('Agg')
+matplotlib.use("Agg")
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -47,8 +47,8 @@ if __name__ == "__main__":
     plt.figure()
     plt.hist(total_actions[:, 0], bins=500)
     plt.xlim(-3, 3)
-    plt.savefig('action_dim_0.png')
+    plt.savefig("action_dim_0.png")
     plt.figure()
     plt.hist(total_actions[:, 1], bins=500)
     plt.xlim(-1.5, 1.5)
-    plt.savefig('action_dim_1.png')
+    plt.savefig("action_dim_1.png")

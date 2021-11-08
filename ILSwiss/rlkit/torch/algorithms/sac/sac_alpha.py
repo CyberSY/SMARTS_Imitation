@@ -50,7 +50,9 @@ class SoftActorCritic(Trainer):
         self.train_alpha = train_alpha
         self.log_alpha = torch.tensor(np.log(alpha), requires_grad=train_alpha)
         self.alpha = self.log_alpha.detach().exp()
-        assert "action_space" in kwargs.keys(), "action spcae should be taken into SAC alpha"
+        assert (
+            "action_space" in kwargs.keys()
+        ), "action spcae should be taken into SAC alpha"
         self.target_entropy = -np.prod(kwargs["action_space"].shape)
 
         self.target_qf1 = qf1.copy()
