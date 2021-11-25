@@ -159,7 +159,9 @@ class SubprocEnvWorker(EnvWorker):
         return decode_obs(self.buffer)
 
     def reset(self) -> Any:
+        print("A")
         self.parent_remote.send(["reset", None])
+        print("B")
         obs = self.parent_remote.recv()
         if self.share_memory:
             obs = self._decode_obs()

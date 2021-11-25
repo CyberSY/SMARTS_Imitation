@@ -1,6 +1,6 @@
 import abc
 
-from rlkit.env_creators import MujocoEnv, ParticleEnv, MpeEnv, GymEnv, SmartsEnv
+from rlkit.env_creators import MujocoEnv, ParticleEnv, MpeEnv, GymEnv, SmartsEnv, MASmartsEnv
 from rlkit.envs.wrappers import ProxyEnv
 from rlkit.envs.vecenvs import BaseVectorEnv, DummyVectorEnv, SubprocVectorEnv
 
@@ -29,6 +29,8 @@ def get_env(env_specs):
         env_class = GymEnv
     elif env_creator == "smarts":
         env_class = SmartsEnv
+    elif env_creator == "masmarts":
+        env_class = MASmartsEnv
     else:
         raise NotImplementedError
 
@@ -64,6 +66,8 @@ def get_envs(
         env_class = GymEnv
     elif env_creator == "smarts":
         env_class = SmartsEnv
+    elif env_creator == "masmarts":
+        env_class = MASmartsEnv
     else:
         raise NotImplementedError
 
@@ -77,8 +81,8 @@ def get_envs(
         )
 
     else:
-#        envs = SubprocVectorEnv(
-        envs = DummyVectorEnv(
+        envs = SubprocVectorEnv(
+#        envs = DummyVectorEnv(
             [
                 lambda: env_wrapper(env_class(**env_specs))
                 for _ in range(env_num)

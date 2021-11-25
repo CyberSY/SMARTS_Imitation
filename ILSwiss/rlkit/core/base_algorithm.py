@@ -1,5 +1,6 @@
 import abc
 import time
+import pdb
 from collections import OrderedDict
 from typing import Dict
 
@@ -9,6 +10,7 @@ from tqdm import tqdm
 
 from rlkit.core import logger, eval_util, dict_list_to_list_dict
 from rlkit.data_management.env_replay_buffer import EnvReplayBuffer
+from rlkit.data_management.policy_replay_buffer import PolicyReplayBuffer
 from rlkit.data_management.path_builder import PathBuilder
 from rlkit.policies.base import ExplorationPolicy
 from rlkit.torch.common.policies import MakeDeterministic
@@ -110,7 +112,7 @@ class BaseAlgorithm(metaclass=abc.ABCMeta):
         self.replay_buffer_size = replay_buffer_size
         if replay_buffer is None:
             assert max_path_length < replay_buffer_size
-            replay_buffer = EnvReplayBuffer(
+            replay_buffer = PolicyReplayBuffer(
                 self.replay_buffer_size, self.env, random_seed=np.random.randint(10000)
             )
         else:
@@ -168,7 +170,7 @@ class BaseAlgorithm(metaclass=abc.ABCMeta):
         self._current_path_builder = [
             PathBuilder(self.agent_ids) for _ in range(len(self.ready_env_ids))
         ]
-
+        terminals_all = np.zeros((self.env_num),dtype = int)
         for epoch in gt.timed_for(
             range(start_epoch, self.num_epochs),
             save_itrs=True,
@@ -186,9 +188,13 @@ class BaseAlgorithm(metaclass=abc.ABCMeta):
             for steps_this_epoch in tqdm(range(self.num_env_steps_per_epoch // self.env_num)):
                 actions_n = self._get_action_and_info(observations_n)
 
-                for a_id in self.agent_ids:
-                    if type(actions_n[a_id]) is tuple:
-                        actions_n[a_id] = actions_n[a_id][0]
+                # for a_id in self.agent_ids:
+                #     if type(actions_n[a_id]) is tuple:
+                #         actions_n[a_id] = actions_n[a_id][0]
+
+                for agent_id, observation in observations_n.items():
+                    if type(actions_n[agent_id]) is tuple:
+                        actions_n[agent_id] = actions_n[agent_id][0]
 
                 if self.render:
                     self.training_env.render()
@@ -212,8 +218,12 @@ class BaseAlgorithm(metaclass=abc.ABCMeta):
                 self._n_env_steps_total += len(self.ready_env_ids)
 
                 rewards_n = raw_rewards_n
-                for a_id in self.agent_ids:
-                    total_rews_n[a_id] += raw_rewards_n[a_id]
+                # for a_id in self.agent_ids:
+                #     total_rews_n[a_id] += raw_rewards_n[a_id]
+                # print("observations_n:{}".format(observations_n.keys()))
+                # print("rew_n:{}".format(raw_rewards_n.keys()))
+                for agent_id, observation in raw_rewards_n.items():
+                    total_rews_n[agent_id] += raw_rewards_n[agent_id]
 
                 self._handle_vec_step(
                     observations_n,
@@ -229,11 +239,16 @@ class BaseAlgorithm(metaclass=abc.ABCMeta):
                     },
                     env_infos_n=env_infos_n,
                 )
-                terminals_all = np.ones_like(list(terminals_n.values())[0])
-                for terminals in terminals_n.values():
-                    terminals_all = np.logical_and(terminals_all, terminals)
-                if np.any(terminals_all):
-                    env_ind_local = np.where(terminals_all)[0]
+                for a_id in terminals_n.keys():
+                    terminals_all += terminals_n[a_id]
+                # terminals_all = np.ones_like(list(terminals_n.values())[0])
+                # for terminals in terminals_n.values():
+                #     terminals_all = np.logical_and(terminals_all, terminals)
+                # pdb.set_trace()
+                if np.any(terminals_all == self.n_agents):
+                    # pdb.set_trace()
+                    env_ind_local = np.where(terminals_all == self.n_agents)[0]
+                    terminals_all[env_ind_local] = 0
                     if flag:
                         pass
                     for a_id in self.agent_ids:
@@ -300,10 +315,14 @@ class BaseAlgorithm(metaclass=abc.ABCMeta):
                             },
                             env_infos_n=env_infos_n,
                         )
+
                     self._handle_vec_rollout_ending(env_ind_local)
                     reset_observations_n = self._start_new_rollout(env_ind_local)
-                    for a_id in self.agent_ids:
-                        next_obs_n[a_id][env_ind_local] = reset_observations_n[a_id]
+                    next_obs_n = reset_observations_n
+                    # for a_id in reset_observations_n.keys():
+                    #     next_obs_n[a_id] = [reset_observations_n[a_id]]
+                    # for a_id in self.agent_ids:
+                    #     next_obs_n[a_id][env_ind_local] = reset_observations_n[a_id]
                 elif np.any(
                     np.array(
                         [
@@ -322,10 +341,14 @@ class BaseAlgorithm(metaclass=abc.ABCMeta):
                         )
                         >= self.max_path_length
                     )[0]
+                    terminals_all[env_ind_local] = 0
                     self._handle_vec_rollout_ending(env_ind_local)
                     reset_observations_n = self._start_new_rollout(env_ind_local)
-                    for a_id in self.agent_ids:
-                        next_obs_n[a_id][env_ind_local] = reset_observations_n[a_id]
+                    next_obs_n = reset_observations_n
+                    # for a_id in reset_observations_n.keys():
+                    #     next_obs_n[a_id] = [reset_observations_n[a_id]]
+                    # for a_id in self.agent_ids:
+                    #     next_obs_n[a_id][env_ind_local] = reset_observations_n[a_id]
 
                 observations_n = next_obs_n
 
@@ -452,38 +475,79 @@ class BaseAlgorithm(metaclass=abc.ABCMeta):
         :param path:
         :return:
         """
-        for (
-            ob_n,
-            action_n,
-            reward_n,
-            next_ob_n,
-            terminal_n,
-            absorbing_n,
-            env_info_n,
-        ) in zip(
-            *map(
-                dict_list_to_list_dict,
-                [
-                    path.get_all_agent_dict("observations"),
-                    path.get_all_agent_dict("actions"),
-                    path.get_all_agent_dict("rewards"),
-                    path.get_all_agent_dict("next_observations"),
-                    path.get_all_agent_dict("terminals"),
-                    path.get_all_agent_dict("absorbings"),
-                    path.get_all_agent_dict("env_infos"),
-                ],
-            )
-        ):
-            self._handle_step(
+        print(path)
+        path_observations = path.get_all_agent_dict("observations")
+        path_actions = path.get_all_agent_dict("actions")
+        path_rewards = path.get_all_agent_dict("rewards")
+        path_next_observations = path.get_all_agent_dict("next_observations")
+        path_terminals = path.get_all_agent_dict("terminals")
+        path_absorbings = path.get_all_agent_dict("absorbings")
+        path_env_infos = path.get_all_agent_dict("env_infos")
+        for agent_id in self.agent_ids:
+            for (
                 ob_n,
                 action_n,
                 reward_n,
                 next_ob_n,
                 terminal_n,
                 absorbing_n,
-                env_info_n=env_info_n,
-                path_builder=False,
-            )
+                env_info_n,
+            ) in zip(
+                *map(
+                    dict_list_to_list_dict,
+                    [
+                        {agent_id:path_observations[agent_id]},
+                        {agent_id:path_actions[agent_id]},
+                        {agent_id:path_rewards[agent_id]},
+                        {agent_id:path_next_observations[agent_id]},
+                        {agent_id:path_terminals[agent_id]},
+                        {agent_id:path_absorbings[agent_id]},
+                        {agent_id:path_env_infos[agent_id]},
+                    ],
+                )
+            ):
+                self._handle_step(
+                    ob_n,
+                    action_n,
+                    reward_n,
+                    next_ob_n,
+                    terminal_n,
+                    absorbing_n,
+                    env_info_n=env_info_n,
+                    path_builder=False,
+                )    
+        # for (
+        #     ob_n,
+        #     action_n,
+        #     reward_n,
+        #     next_ob_n,
+        #     terminal_n,
+        #     absorbing_n,
+        #     env_info_n,
+        # ) in zip(
+        #     *map(
+        #         dict_list_to_list_dict,
+        #         [
+        #             path.get_all_agent_dict("observations"),
+        #             path.get_all_agent_dict("actions"),
+        #             path.get_all_agent_dict("rewards"),
+        #             path.get_all_agent_dict("next_observations"),
+        #             path.get_all_agent_dict("terminals"),
+        #             path.get_all_agent_dict("absorbings"),
+        #             path.get_all_agent_dict("env_infos"),
+        #         ],
+        #     )
+        # ):
+        #     self._handle_step(
+        #         ob_n,
+        #         action_n,
+        #         reward_n,
+        #         next_ob_n,
+        #         terminal_n,
+        #         absorbing_n,
+        #         env_info_n=env_info_n,
+        #         path_builder=False,
+        #     )
 
     def _handle_vec_step(
         self,
@@ -499,6 +563,7 @@ class BaseAlgorithm(metaclass=abc.ABCMeta):
         Implement anything that needs to happen after every step under vec envs
         :return:
         """
+
         for env_idx, (
             ob_n,
             action_n,
@@ -553,7 +618,19 @@ class BaseAlgorithm(metaclass=abc.ABCMeta):
         :return:
         """
         if path_builder:
-            for a_id in self.agent_ids:
+            # for a_id in self.agent_ids:
+            #     self._current_path_builder[env_idx][a_id].add_all(
+            #         observations=observation_n[a_id],
+            #         actions=action_n[a_id],
+            #         rewards=reward_n[a_id],
+            #         next_observations=next_observation_n[a_id],
+            #         terminals=terminal_n[a_id],
+            #         absorbings=absorbing_n[a_id],
+            #         env_infos=env_info_n[a_id],
+            #     )
+            for a_id in observation_n.keys():
+                if(a_id not in reward_n.keys()):
+                    continue
                 self._current_path_builder[env_idx][a_id].add_all(
                     observations=observation_n[a_id],
                     actions=action_n[a_id],
@@ -564,6 +641,18 @@ class BaseAlgorithm(metaclass=abc.ABCMeta):
                     env_infos=env_info_n[a_id],
                 )
         if add_buf:
+            # pdb.set_trace()
+            # for agent_id in self.agent_ids:
+            #     pdb.set_trace()
+            #     self.replay_buffer.add_sample(
+            #         observation_n={agent_id:observation_n[agent_id]},
+            #         action_n={agent_id:action_n[agent_id]},
+            #         reward_n={agent_id:reward_n[agent_id]},
+            #         terminal_n={agent_id:terminal_n[agent_id]},
+            #         next_observation_n={agent_id:next_observation_n[agent_id]},
+            #         absorbing_n={agent_id:absorbing_n[agent_id]},
+            #         env_info_n={agent_id:env_info_n[agent_id]},
+            #     )
             self.replay_buffer.add_sample(
                 observation_n=observation_n,
                 action_n=action_n,

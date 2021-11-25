@@ -235,8 +235,11 @@ class BaseVectorEnv(Env):
             result = []
             for j in id:
                 obs, rew, done, info = self.workers[j].get_result()
-                for a_id in self.agent_ids:
-                    info[a_id]["env_id"] = j
+                # for a_id in self.agent_ids:
+                #     info[a_id]["env_id"] = j
+                
+                for agent_id in obs.keys():
+                    info[agent_id]["env_id"] = j
                 result.append((obs, rew, done, info))
         else:
             if action_n is not None:

@@ -47,8 +47,9 @@ def rollout(
                     ],
                 )
             )
-
-        for agent_id in agent_ids:
+        for agent_id in next_observations_n.keys():
+            if(agent_id not in observations_n.keys()):
+                continue
             for idx, (
                 observation_n,
                 action_n,
@@ -81,6 +82,39 @@ def rollout(
                     absorbings=np.array([0.0, 0.0]),
                     env_infos=env_info_n[agent_id],
                 )
+        # for agent_id in agent_ids:
+        #     for idx, (
+        #         observation_n,
+        #         action_n,
+        #         reward_n,
+        #         next_observation_n,
+        #         terminal_n,
+        #         env_info_n,
+        #     ) in enumerate(
+        #         zip(
+        #             *map(
+        #                 dict_list_to_list_dict,
+        #                 [
+        #                     observations_n,
+        #                     actions_n,
+        #                     rewards_n,
+        #                     next_observations_n,
+        #                     terminals_n,
+        #                     env_infos_n,
+        #                 ],
+        #             )
+        #         )
+        #     ):
+        #         env_idx = ready_env_ids[idx]
+        #         path_builder[env_idx][agent_id].add_all(
+        #             observations=observation_n[agent_id],
+        #             actions=action_n[agent_id],
+        #             rewards=np.array([reward_n[agent_id]]),
+        #             next_observations=next_observation_n[agent_id],
+        #             terminals=np.array([terminal_n[agent_id]]),
+        #             absorbings=np.array([0.0, 0.0]),
+        #             env_infos=env_info_n[agent_id],
+        #         )
 
         terminals_all = np.ones_like(list(terminals_n.values())[0])
         for terminals in terminals_n.values():
@@ -92,7 +126,12 @@ def rollout(
                 break
 
         observations_n = {}
-        for agent_id in agent_ids:
+        # for agent_id in agent_ids:
+        #     observations_n[agent_id] = next_observations_n[agent_id][
+        #         np.where(terminals_all == False)
+        #     ]
+
+        for agent_id in next_observations_n.keys():
             observations_n[agent_id] = next_observations_n[agent_id][
                 np.where(terminals_all == False)
             ]

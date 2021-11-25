@@ -11,6 +11,7 @@ import rlkit.torch.utils.pytorch_util as ptu
 from rlkit.torch.core import np_to_pytorch_batch
 from rlkit.torch.algorithms.torch_base_algorithm import TorchBaseAlgorithm
 
+import pdb
 
 class AdvIRL(TorchBaseAlgorithm):
     """
@@ -91,7 +92,6 @@ class AdvIRL(TorchBaseAlgorithm):
         )
         self.bce.to(ptu.device)
         self.bce_targets.to(ptu.device)
-
         self.use_grad_pen = use_grad_pen
         self.grad_pen_weight = grad_pen_weight
 
@@ -137,6 +137,12 @@ class AdvIRL(TorchBaseAlgorithm):
                     self._do_reward_training(epoch, a_id)
                 for _ in range(self.num_policy_updates_per_loop_iter):
                     self._do_policy_training(epoch, a_id)
+        # for t in range(self.num_update_loops_per_train_call):
+        #     for p_id in self.policy_ids:
+        #         for _ in range(self.num_disc_updates_per_loop_iter):
+        #             self._do_reward_training(epoch, p_id)
+        #         for _ in range(self.num_policy_updates_per_loop_iter):
+        #             self._do_policy_training(epoch, p_id)
 
     def _do_reward_training(self, epoch, agent_id):
         """
@@ -155,8 +161,8 @@ class AdvIRL(TorchBaseAlgorithm):
         if self.wrap_absorbing:
             keys.append("absorbing")
 
-        expert_batch = self.get_batch(self.disc_optim_batch_size, agent_id, True, keys)
-        policy_batch = self.get_batch(self.disc_optim_batch_size, agent_id, False, keys)
+        expert_batch = self.get_batch(self.disc_optim_batch_size, agent_id,True, keys)
+        policy_batch = self.get_batch(self.disc_optim_batch_size, agent_id,False, keys)
 
         expert_obs = expert_batch["observations"]
         policy_obs = policy_batch["observations"]
@@ -329,6 +335,18 @@ class AdvIRL(TorchBaseAlgorithm):
         self.disc_eval_statistics[f"{agent_id} Disc Rew Min"] = np.min(
             ptu.get_numpy(policy_batch["rewards"])
         )
+        # self.disc_eval_statistics[f"{policy_id} Disc Rew Mean"] = np.mean(
+        #     ptu.get_numpy(policy_batch["rewards"])
+        # )
+        # self.disc_eval_statistics[f"{policy_id} Disc Rew Std"] = np.std(
+        #     ptu.get_numpy(policy_batch["rewards"])
+        # )
+        # self.disc_eval_statistics[f"{policy_id} Disc Rew Max"] = np.max(
+        #     ptu.get_numpy(policy_batch["rewards"])
+        # )
+        # self.disc_eval_statistics[f"{policy_id} Disc Rew Min"] = np.min(
+        #     ptu.get_numpy(policy_batch["rewards"])
+        # )
 
     @property
     def networks_n(self):

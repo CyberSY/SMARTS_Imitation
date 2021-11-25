@@ -40,3 +40,23 @@ register(
         ),
     ),
 )
+
+register(
+    id="SMARTS-Imitation-v2",
+    entry_point="smarts_imitation.envs:MASMARTSImitation",
+    kwargs=dict(
+        scenarios=[
+            os.path.join(
+                os.path.dirname(__file__),
+                "../ngsim",
+            )
+        ],
+        action_range=np.array(
+            [
+                [-2.5, -0.2],
+                [2.5, 0.2],
+            ]
+        ),
+    ),
+)
+

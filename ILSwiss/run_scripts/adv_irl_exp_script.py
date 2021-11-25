@@ -177,7 +177,6 @@ def experiment(variant):
         expert_replay_buffer=expert_replay_buffer,
         **variant["adv_irl_params"],
     )
-
     if ptu.gpu_enabled():
         algorithm.to(ptu.device)
     algorithm.train()

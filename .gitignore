@@ -142,3 +142,4 @@ assets/
 *.pkl
 original/
 *.shf
+logs/

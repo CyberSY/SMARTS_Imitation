@@ -13,7 +13,7 @@ class EnvReplayBuffer:
         self.n_agents = env.n_agents
         self.agent_ids = env.agent_ids
         # TODO(zbzhu): MAYBE change agent_buffers to policy_buffers
-        self.agent_buffers = {
+        self.agent_buffer_n = {
             a_id: AgentEnvReplayBuffer(
                 max_replay_buffer_size,
                 self._observation_space_n[a_id],
@@ -24,24 +24,24 @@ class EnvReplayBuffer:
         self._max_replay_buffer_size = max_replay_buffer_size
 
     def num_steps_can_sample(self):
-        return list(self.agent_buffers.values())[0].num_steps_can_sample()
+        return list(self.agent_buffer_n.values())[0].num_steps_can_sample()
 
     def random_batch(self, batch_size: int, agent_id: str, keys):
-        return self.agent_buffers[agent_id].random_batch(batch_size, keys)
+        return self.agent_buffer_n[agent_id].random_batch(batch_size, keys)
 
     def terminate_episode(self):
         for a_id in self.agent_ids:
-            self.agent_buffers[a_id].terminate_episode()
+            self.agent_buffer_n[a_id].terminate_episode()
 
     def sample_all_trajs(self, agent_id: str):
-        return self.agent_buffers[agent_id].sample_all_trajs()
+        return self.agent_buffer_n[agent_id].sample_all_trajs()
 
     def clear(self, agent_id: str):
-        self.agent_buffers[agent_id].clear()
+        self.agent_buffer_n[agent_id].clear()
 
     def add_path(self, path_n, absorbing=False, env=None):
         for a_id in self.agent_ids:
-            self.agent_buffers[a_id].add_path(
+            self.agent_buffer_n[a_id].add_path(
                 path_n[a_id],
                 absorbing=absorbing,
                 env=env
@@ -57,7 +57,7 @@ class EnvReplayBuffer:
         **kwargs,
     ):
         for a_id in observation_n.keys():
-            self.agent_buffers[a_id].add_sample(
+            self.agent_buffer_n[a_id].add_sample(
                 observation_n[a_id],
                 action_n[a_id],
                 reward_n[a_id],
