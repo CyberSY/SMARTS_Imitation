@@ -1,7 +1,10 @@
 import numpy as np
 import gym
 import sys
-import pickle
+import os
+import json
+import subprocess
+import signal
 from dataclasses import replace
 
 from smarts.core.smarts import SMARTS
@@ -11,17 +14,12 @@ from smarts.core.traffic_history_provider import TrafficHistoryProvider
 from smarts_imitation.utils import agent
 from envision.client import Client as Envision
 
-from dataclasses import replace
-
-sys.path.append(r"/NAS2020/Workspaces/DRLGroup/syzhang/SMARTS_Imitation/ILSwiss")
-from rlkit.torch.common.networks import FlattenMlp
+sys.path.append("./ILSwiss")
 from rlkit.torch.common.policies import ReparamTanhMultivariateGaussianPolicy
-from rlkit.torch.algorithms.sac.sac_alpha import (
-    SoftActorCritic,
-) 
-from rlkit.torch.algorithms.adv_irl.disc_models.simple_disc_models import MLPDisc
 
 import joblib
+import argparse
+
 
 class SMARTSImitation(gym.Env):
     def __init__(self, scenarios, action_range):
@@ -30,7 +28,9 @@ class SMARTSImitation(gym.Env):
         self._next_scenario()
         self.obs_stacked_size = 1
         self.agent_spec = agent.get_agent_spec(self.obs_stacked_size)
-        self.observation_space = gym.spaces.Box(low=-np.inf, high=np.inf, shape=(28,), dtype=np.float64)
+        self.observation_space = gym.spaces.Box(
+            low=-np.inf, high=np.inf, shape=(28,), dtype=np.float64
+        )
         self.action_space = gym.spaces.Box(
             low=np.array([-1.0, -1.0]), high=np.array([1.0, 1.0]), dtype=np.float64
         )
@@ -41,11 +41,11 @@ class SMARTSImitation(gym.Env):
         self._action_range = action_range  # np.array([[low], [high]])
 
         envision_client = Envision(
-                endpoint=None,
-                sim_name="NGSIM_TEST",
-                output_dir=None,
-                headless=None,
-            )
+            endpoint=None,
+            sim_name="NGSIM_TEST",
+            output_dir=None,
+            headless=None,
+        )
         self.smarts = SMARTS(
             agent_interfaces={},
             traffic_sim=None,
@@ -129,41 +129,50 @@ class SMARTSImitation(gym.Env):
         if self.smarts is not None:
             self.smarts.destroy()
 
-env = SMARTSImitation(scenarios = ["./ngsim"],action_range=np.array([[-2.5, -0.2],[2.5, 0.2]]))
-obs_space = env.observation_space
-act_space = env.action_space
 
-variant = {  "disc_num_blocks": 2,
-    "disc_hid_dim": 128,
-    "disc_hid_act": "tanh",
-    "disc_use_bn": False,
-    "disc_clamp_magnitude": 10.0,
-    "policy_net_size": 256,
-    "policy_num_hidden_layers": 2}
-obs_dim = obs_space.shape[0]
-action_dim = act_space.shape[0]
-net_size = variant["policy_net_size"]
-num_hidden = variant["policy_num_hidden_layers"]
-policy = ReparamTanhMultivariateGaussianPolicy(
-    hidden_sizes=num_hidden * [net_size],
-    obs_dim=obs_dim,
-    action_dim=action_dim,
-)
+if __name__ == '__main__':
 
-log_path = "../logs/gail-smarts-ngsim--terminal--gp-4.0--rs-2.0--trajnum--1/gail_smarts_ngsim--terminal--gp-4.0--rs-2.0--trajnum--1_2021_10_11_11_27_19_0000--s-723894/best.pkl"
-# log_path = "../logs/magail-smarts-ngsim--terminal--gp-4.0--rs-2.0--trajnum--1/magail_smarts_ngsim--terminal--gp-4.0--rs-2.0--trajnum--1_2021_11_18_07_08_07_0000--s-723894/best.pkl"
-with open(log_path, "rb") as f:
+    parser = argparse.ArgumentParser("Single agent visualization contolled with learned model")
+    parser.add_argument("log_dir", type=str, help="Path to the log directory")
+    parser.add_argument("--num_trajs", type=int, default=10, help="Num of trajectories to be sampled")
+    args = parser.parse_args()
+
+    envision_proc = subprocess.Popen("scl envision start -s ./smarts-imitation/ngsim", shell=True)
+
+    env = SMARTSImitation(
+        scenarios=["./smarts-imitation/ngsim"], action_range=np.array([[-2.5, -0.2], [2.5, 0.2]])
+    )
+    obs_space = env.observation_space
+    act_space = env.action_space
+
+    with open(os.path.join(args.log_dir, "variant.json"), "rb") as f:
+        variant = json.load(f)
+
+    obs_dim = obs_space.shape[0]
+    action_dim = act_space.shape[0]
+    net_size = variant["policy_net_size"]
+    num_hidden = variant["policy_num_hidden_layers"]
+    policy = ReparamTanhMultivariateGaussianPolicy(
+        hidden_sizes=num_hidden * [net_size],
+        obs_dim=obs_dim,
+        action_dim=action_dim,
+    )
+
+    with open(os.path.join(args.log_dir, "params.pkl"), "rb") as f:
         param = joblib.load(f)
-policy.load_state_dict(param["policy_0"]["policy"].state_dict())
-observations = env.reset()
-dones = {}
-print(observations)
 
+    policy.load_state_dict(param["policy_0"]["policy"].state_dict())
 
-for step in range(1000):
-    agent_actions = policy.get_actions(np.array([observations]))[0]
-    if(dones):
-        break
-    observations, rew, dones, _ = env.step(agent_actions)
+    for epoch in range(args.num_trajs):
+        observations = env.reset()
+        dones = {}
+        for step in range(1000):
+            agent_actions = policy.get_actions(np.array([observations]))[0]
+            if dones:
+                break
+            observations, rew, dones, _ = env.step(agent_actions)
 
-env.destroy()
+    env.destroy()
+
+    os.killpg(os.getpgid(envision_proc.pid), signal.SIGKILL)
+    envision_proc.wait()
