@@ -15,9 +15,38 @@ from multiprocessing import Array, Pipe, connection
 from smarts.core.smarts import SMARTS
 from smarts.core.scenario import Scenario
 from smarts.core.traffic_history_provider import TrafficHistoryProvider
+from smarts.core.agent import AgentSpec
+from smarts.core.agent_interface import AgentInterface
+from smarts.core.controllers import ActionSpaceType
 
-from smarts_imitation.utils import agent
+# from smarts_imitation.utils import agent
 import cloudpickle
+
+def get_action_adapter():
+    def action_adapter(model_action):
+        assert len(model_action) == 2
+        return (model_action[0], model_action[1])
+
+    return action_adapter
+
+def get_agent_spec(obs_stack_size):
+
+    agent_spec = AgentSpec(
+        interface=AgentInterface(
+            max_episode_steps=None,
+            waypoints=True,
+            neighborhood_vehicles=True,
+            ogm=False,
+            rgb=False,
+            lidar=False,
+            action=ActionSpaceType.Imitation,
+        ),
+        # observation_adapter=adapter.get_observation_adapter(obs_stack_size),
+        action_adapter=get_action_adapter(),
+    )
+
+    return agent_spec
+
 
 
 def list_dict_to_dict_list(list_dict):
@@ -86,7 +115,7 @@ class SMARTSImitation(gym.Env):
         self.scenarios_iterator = Scenario.scenario_variations(scenarios, [])
         self._next_scenario()
         self.obs_stacked_size = 1
-        self.agent_spec = agent.get_agent_spec(self.obs_stacked_size)
+        self.agent_spec = get_agent_spec(self.obs_stacked_size)
         self.observation_space = gym.spaces.Box(
             low=-np.inf, high=np.inf, shape=(28,), dtype=np.float64
         )
@@ -110,21 +139,8 @@ class SMARTSImitation(gym.Env):
         np.random.seed(seed)
 
     def _convert_obs(self, raw_observations):
-        observation = self.agent_spec.observation_adapter(
-            raw_observations[self.vehicle_id]
-        )
-        ego_state = []
-        other_info = []
-        for feat in observation:
-            if feat in ["ego_pos", "speed", "heading"]:
-                ego_state.append(observation[feat])
-            else:
-                other_info.append(observation[feat])
-        ego_state = np.concatenate(ego_state, axis=1).reshape(-1)
-        other_info = np.concatenate(other_info, axis=1).reshape(-1)
-        full_obs = np.concatenate((ego_state, other_info))
-        full_obs = {"agent_0": full_obs}
-        return full_obs
+        raw_observations = {"agent_0" : raw_observations[self.vehicle_id]}
+        return raw_observations
 
     def step(self, action):
         action = action["agent_0"]
