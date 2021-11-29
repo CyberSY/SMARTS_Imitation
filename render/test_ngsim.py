@@ -184,7 +184,7 @@ class MASMARTSImitation(gym.Env):
     def destroy(self):
         if self.smarts is not None:
             self.smarts.destroy()
-env = MASMARTSImitation(scenarios = ["./ngsim"],action_range=np.array([[-2.5, -0.2],[2.5, 0.2]]),agent_number = 10)
+env = MASMARTSImitation(scenarios = ["./ngsim"],action_range=np.array([[-2.5, -0.2],[2.5, 0.2]]),agent_number = 5)
 obs_space_n = env.observation_space
 act_space_n = env.action_space
 
@@ -264,27 +264,27 @@ for agent_id in env.agent_ids:
     else:
         print(f"Use existing {policy_id} for {agent_id} ...")
 
-
-log_path = "../logs/magail-smarts-ngsim--terminal--gp-4.0--rs-2.0--trajnum--1/magail_smarts_ngsim--terminal--gp-4.0--rs-2.0--trajnum--1_2021_11_18_07_08_07_0000--s-723894/best.pkl"
+log_path = "../logs/gail-smarts-ngsim--terminal--gp-4.0--rs-2.0--trajnum--1/gail_smarts_ngsim--terminal--gp-4.0--rs-2.0--trajnum--1_2021_10_11_11_27_19_0000--s-723894/best.pkl"
+# log_path = "../logs/magail-smarts-ngsim--terminal--gp-4.0--rs-2.0--trajnum--1/magail_smarts_ngsim--terminal--gp-4.0--rs-2.0--trajnum--1_2021_11_18_07_08_07_0000--s-723894/best.pkl"
 with open(log_path, "rb") as f:
         param = joblib.load(f)
-# policy_n["policy_0"].load_state_dict(param["policy_0"]["policy"])
-print(param.keys())
+policy_n["policy_0"].load_state_dict(param["policy_0"]["policy"].state_dict())
 observations = env.reset()
 dones = {}
 print(observations)
 for agent_id in observations.keys():
     dones[agent_id] = False
 
-
+d = 0
 for step in range(2000):
     agent_actions = {}
-    for agent_id in observations.keys():
+    for agent_id,observation in observations.items():
         if(dones[agent_id]):
+            d += 1
             continue
-        agent_actions[agent_id] = np.random.random((2))
+        agent_actions[agent_id] = policy_n["policy_0"].get_actions(np.array([observation]))[0]
+    if(d == 5):
+        break
     observations, rew, dones, _ = env.step(agent_actions)
-    if(step % 100 == 0):
-        print(step)
 
 env.destroy()

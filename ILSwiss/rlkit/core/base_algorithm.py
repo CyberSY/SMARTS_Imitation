@@ -166,7 +166,7 @@ class BaseAlgorithm(metaclass=abc.ABCMeta):
         observations_n = self._start_new_rollout(
             self.ready_env_ids
         )  # Do it for support vec env
-
+        pdb.set_trace()
         self._current_path_builder = [
             PathBuilder(self.agent_ids) for _ in range(len(self.ready_env_ids))
         ]
