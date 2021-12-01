@@ -875,3 +875,6 @@ if __name__ == "__main__":
         action = np.random.rand(2, 2)
         action = {"agent_0": action}
         next_ob, raw_reward, terminal, env_info = training_envs.step(action)
+        for i in range(env_num):
+            if(terminal["agent_0"][i]):
+                training_envs.reset(i)
