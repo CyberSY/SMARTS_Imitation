@@ -23,6 +23,8 @@ def rollout(
     ready_env_ids = np.arange(env_num)
     observations_n = eval_env.reset(ready_env_ids)
 
+    terminals_all = np.zeros((env_num),dtype = int)
+
     for _ in range(max_path_length):
         actions_n = {}
         agent_infos_n = {}
@@ -115,12 +117,16 @@ def rollout(
         #             absorbings=np.array([0.0, 0.0]),
         #             env_infos=env_info_n[agent_id],
         #         )
-
-        terminals_all = np.ones_like(list(terminals_n.values())[0])
-        for terminals in terminals_n.values():
-            terminals_all = np.logical_and(terminals_all, terminals)
-        if np.any(terminals_all):
-            end_env_ids = ready_env_ids[np.where(terminals_all)[0]]
+        for a_id in terminals_n.keys():
+            terminals_all += terminals_n[a_id]
+        # terminals_all = np.ones_like(list(terminals_n.values())[0])
+        # for terminals in terminals_n.values():
+        #     terminals_all = np.logical_and(terminals_all, terminals)
+        if np.any(terminals_all == n_agents):
+            env_ind_local = np.where(terminals_all == n_agents)[0]
+            # terminals_all[env_ind_local] = 0
+            # end_env_ids = ready_env_ids[np.where(terminals_all)[0]]
+            end_env_ids = ready_env_ids[env_ind_local]
             ready_env_ids = np.array(list(set(ready_env_ids) - set(end_env_ids)))
             if len(ready_env_ids) == 0:
                 break
@@ -133,7 +139,7 @@ def rollout(
 
         for agent_id in next_observations_n.keys():
             observations_n[agent_id] = next_observations_n[agent_id][
-                np.where(terminals_all == False)
+                np.where(terminals_all != n_agents)
             ]
 
     return path_builder

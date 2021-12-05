@@ -166,7 +166,7 @@ class BaseAlgorithm(metaclass=abc.ABCMeta):
         observations_n = self._start_new_rollout(
             self.ready_env_ids
         )  # Do it for support vec env
-        pdb.set_trace()
+        # pdb.set_trace()
         self._current_path_builder = [
             PathBuilder(self.agent_ids) for _ in range(len(self.ready_env_ids))
         ]
@@ -224,21 +224,21 @@ class BaseAlgorithm(metaclass=abc.ABCMeta):
                 # print("rew_n:{}".format(raw_rewards_n.keys()))
                 for agent_id, observation in raw_rewards_n.items():
                     total_rews_n[agent_id] += raw_rewards_n[agent_id]
-
-                self._handle_vec_step(
-                    observations_n,
-                    actions_n,
-                    rewards_n,
-                    next_obs_n,
-                    terminals_n,
-                    absorbings_n={
-                        a_id: [
-                            np.array([0.0, 0.0]) for _ in range(len(self.ready_env_ids))
-                        ]
-                        for a_id in self.agent_ids
-                    },
-                    env_infos_n=env_infos_n,
-                )
+                if(next_obs_n and observations_n):
+                    self._handle_vec_step(
+                        observations_n,
+                        actions_n,
+                        rewards_n,
+                        next_obs_n,
+                        terminals_n,
+                        absorbings_n={
+                            a_id: [
+                                np.array([0.0, 0.0]) for _ in range(len(self.ready_env_ids))
+                            ]
+                            for a_id in next_obs_n.keys()
+                        },
+                        env_infos_n=env_infos_n,
+                    )
                 for a_id in terminals_n.keys():
                     terminals_all += terminals_n[a_id]
                 # terminals_all = np.ones_like(list(terminals_n.values())[0])
@@ -483,7 +483,8 @@ class BaseAlgorithm(metaclass=abc.ABCMeta):
         path_terminals = path.get_all_agent_dict("terminals")
         path_absorbings = path.get_all_agent_dict("absorbings")
         path_env_infos = path.get_all_agent_dict("env_infos")
-        for agent_id in self.agent_ids:
+        # for agent_id in self.agent_ids:
+        for agent_id in path_next_observations.keys():
             for (
                 ob_n,
                 action_n,
@@ -563,7 +564,7 @@ class BaseAlgorithm(metaclass=abc.ABCMeta):
         Implement anything that needs to happen after every step under vec envs
         :return:
         """
-
+        # pdb.set_trace()
         for env_idx, (
             ob_n,
             action_n,
@@ -629,7 +630,7 @@ class BaseAlgorithm(metaclass=abc.ABCMeta):
             #         env_infos=env_info_n[a_id],
             #     )
             for a_id in observation_n.keys():
-                if(a_id not in reward_n.keys()):
+                if(a_id not in reward_n.keys() or a_id not in next_observation_n.keys()):
                     continue
                 self._current_path_builder[env_idx][a_id].add_all(
                     observations=observation_n[a_id],

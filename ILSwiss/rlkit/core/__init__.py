@@ -3,7 +3,7 @@ General classes, functions, utilities that are used throughout rlkit.
 """
 
 from collections import defaultdict
-
+import pdb
 
 def list_dict_to_dict_list(list_dict):
     dict_list = defaultdict(list)
@@ -17,6 +17,12 @@ def dict_list_to_list_dict(dict_list):
     # For example,
     # Input: {"agent_0": [1, 2], "agent_1": [3, 4]}
     # Output: [{"agent_0": 1, "agent_1": 3}, {"agent_0": 2, "agent_1": 4}]
+    if not dict_list:
+        pdb.set_trace()
+    # length = len(list(dict_list.values())[0])
+    # for k, v in dict_list.items():
+    #     if(len(v) != length):
+    #         pdb.set_trace()
     list_dict = [
         {k: v[idx] for k, v in dict_list.items()}
         for idx in range(len(list(dict_list.values())[0]))

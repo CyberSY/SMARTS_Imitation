@@ -167,6 +167,7 @@ class CalObs:
             ego, neighbor_vehicle_states, n=closest_neighbor_num
         )
         for i, v in surrounding_vehicles.items():
+            pdb.set_trace()
             if v[0] is None:
                 v = ego
             else:

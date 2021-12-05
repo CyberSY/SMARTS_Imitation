@@ -8,6 +8,7 @@ import os
 import json
 
 import numpy as np
+import pdb
 
 from rlkit.core.vistools import plot_returns_on_same_plot
 
@@ -17,7 +18,17 @@ def get_generic_path_information(paths, stat_prefix=""):
     Get an OrderedDict with a bunch of statistic names and values.
     """
     # XXX(zbzhu): maybe consider a better way to get `agent_ids`
-    agent_ids = paths[0].agent_ids
+    n_agent_ids = paths[0].agent_ids
+    agent_ids = []
+    for a_id in n_agent_ids:
+        flag = 0
+        for path in paths:
+            if(not path[a_id]):
+                pdb.set_trace()
+                flag = 1
+        if(flag == 0):
+            agent_ids.append(a_id)
+
 
     """ Bunch of deprecated codes and comments. Will be removed soon.
     # returns = [sum(path["rewards"]) for path in paths]
@@ -32,6 +43,13 @@ def get_generic_path_information(paths, stat_prefix=""):
     statistics = OrderedDict()
 
     # driving scenarios specific metrics
+    # distance_travelled_n = {}
+    # success_rate_n = {}
+    # collision_rate_n = {}
+    # returns_n = {}
+    # rewards_n = {}
+    # actions_n = {}
+
     distance_travelled_n = {
         a_id: [abs(path[a_id]["observations"][-1][0] - path[a_id]["observations"][0][0]) for path in paths]
         for a_id in agent_ids
