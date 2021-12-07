@@ -56,7 +56,7 @@ def experiment(variant):
         traj_list = random.sample(traj_list, variant["traj_num"])
 
     env_specs = variant["env_specs"]
-    env_specs["env_kwargs"]["agent_number"] = 5
+    env_specs["env_kwargs"]["agent_number"] = 1
     env = get_env(env_specs)
     env.seed(env_specs["eval_env_seed"])
 
