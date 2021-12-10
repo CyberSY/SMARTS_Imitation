@@ -25,18 +25,11 @@ import math
 import gym
 import cv2
 import numpy as np
-import copy
 
-from typing import Dict
 from collections import namedtuple
-
-from ray.rllib.evaluation import MultiAgentEpisode, RolloutWorker
-from ray.rllib.env import BaseEnv
-from ray.rllib.policy import Policy
 
 from smarts.core.sensors import Observation
 from smarts.core.utils.math import vec_2d
-from smarts.core.controllers import ActionSpaceType
 
 
 Config = namedtuple(

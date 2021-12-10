@@ -61,6 +61,7 @@ def _worker(
     p: connection.Connection,
     env_fn_wrapper: CloudpickleWrapper,
     obs_bufs: Optional[Union[dict, tuple, ShArray]] = None,
+    auto_reset: bool = False,
 ) -> None:
     def _encode_obs(
         obs: Union[dict, tuple, np.ndarray], buffer: Union[dict, tuple, ShArray]
@@ -89,13 +90,11 @@ def _worker(
                 if obs_bufs is not None:
                     _encode_obs(obs, obs_bufs)
                     obs = None
+                if all(list(done.values())) and auto_reset:
+                    obs = env.reset()
                 p.send((obs, reward, done, info))
             elif cmd == "reset":
-                # try:
                 obs = env.reset()
-                # except Exception as e:
-                #     print("reset", e)
-                #     print(traceback.format_exc())
                 if obs_bufs is not None:
                     _encode_obs(obs, obs_bufs)
                     obs = None
@@ -121,7 +120,7 @@ class SubprocEnvWorker(EnvWorker):
     """Subprocess worker used in SubprocVectorEnv and ShmemVectorEnv."""
 
     def __init__(
-        self, env_fn: Callable[[], gym.Env], share_memory: bool = False
+        self, env_fn: Callable[[], gym.Env], share_memory: bool = False, auto_reset: bool = False
     ) -> None:
         self.parent_remote, self.child_remote = Pipe()
         self.share_memory = share_memory
@@ -137,12 +136,12 @@ class SubprocEnvWorker(EnvWorker):
             self.child_remote,
             CloudpickleWrapper(env_fn),
             self.buffer,
+            auto_reset,
         )
         self.process = Process(target=_worker, args=args, daemon=True)
         self.process.start()
         self.child_remote.close()
-        super().__init__(env_fn)
-        # print("\nSuccess Created ... \n")
+        super().__init__(env_fn, auto_reset=auto_reset)
 
     def __getattr__(self, key: str) -> Any:
         self.parent_remote.send(["getattr", key])

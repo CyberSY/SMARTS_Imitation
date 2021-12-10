@@ -1,110 +1,13 @@
 import numpy as np
-from typing import Dict
 
-from rlkit.core import dict_list_to_list_dict
 from rlkit.data_management.path_builder import PathBuilder
-
-
-def rollout(
-    env,
-    eval_env,
-    policy_n: Dict,
-    policy_mapping_dict,
-    max_path_length,
-    no_terminal=False,
-    render=False,
-    render_kwargs={},
-):
-    agent_ids = env.agent_ids
-    n_agents = env.n_agents
-    env_num = len(eval_env)
-    path_builder = [PathBuilder(agent_ids) for _ in range(env_num)]
-
-    ready_env_ids = np.arange(env_num)
-    observations_n = eval_env.reset(ready_env_ids)
-
-    for _ in range(max_path_length):
-        actions_n = {}
-        agent_infos_n = {}
-        for agent_id, observations in observations_n.items():
-            policy_id = policy_mapping_dict[agent_id]
-            actions_n[agent_id], agent_infos_n[agent_id] = policy_n[
-                policy_id
-            ].get_action(observations)
-        if render:
-            eval_env.render(**render_kwargs)
-
-        next_observations_n, rewards_n, terminals_n, env_infos_n = eval_env.step(
-            actions_n, ready_env_ids
-        )
-        if no_terminal:
-            terminals_n = dict(
-                zip(
-                    agent_ids,
-                    [
-                        [False for _ in range(len(ready_env_ids))]
-                        for _ in range(n_agents)
-                    ],
-                )
-            )
-
-        for agent_id in agent_ids:
-            for idx, (
-                observation_n,
-                action_n,
-                reward_n,
-                next_observation_n,
-                terminal_n,
-                env_info_n,
-            ) in enumerate(
-                zip(
-                    *map(
-                        dict_list_to_list_dict,
-                        [
-                            observations_n,
-                            actions_n,
-                            rewards_n,
-                            next_observations_n,
-                            terminals_n,
-                            env_infos_n,
-                        ],
-                    )
-                )
-            ):
-                env_idx = ready_env_ids[idx]
-                path_builder[env_idx][agent_id].add_all(
-                    observations=observation_n[agent_id],
-                    actions=action_n[agent_id],
-                    rewards=np.array([reward_n[agent_id]]),
-                    next_observations=next_observation_n[agent_id],
-                    terminals=np.array([terminal_n[agent_id]]),
-                    absorbings=np.array([0.0, 0.0]),
-                    env_infos=env_info_n[agent_id],
-                )
-
-        terminals_all = np.ones_like(list(terminals_n.values())[0])
-        for terminals in terminals_n.values():
-            terminals_all = np.logical_and(terminals_all, terminals)
-        if np.any(terminals_all):
-            end_env_ids = ready_env_ids[np.where(terminals_all)[0]]
-            ready_env_ids = np.array(list(set(ready_env_ids) - set(end_env_ids)))
-            if len(ready_env_ids) == 0:
-                break
-
-        observations_n = {}
-        for agent_id in agent_ids:
-            observations_n[agent_id] = next_observations_n[agent_id][
-                np.where(terminals_all == False)
-            ]
-
-    return path_builder
 
 
 class PathSampler:
     def __init__(
         self,
         env,
-        eval_env,
+        vec_env,
         policy_n,
         policy_mapping_dict,
         num_steps,
@@ -119,7 +22,9 @@ class PathSampler:
         have been sampled
         """
         self.env = env
-        self.eval_env = eval_env
+        self.vec_env = vec_env
+        self.env_num = vec_env.env_num
+        self.wait_num = vec_env.wait_num
         self.policy_n = policy_n
         self.policy_mapping_dict = policy_mapping_dict
         self.num_steps = num_steps
@@ -127,192 +32,107 @@ class PathSampler:
         self.no_terminal = no_terminal
         self.render = render
         self.render_kwargs = render_kwargs
+        self.agent_ids = self.env.agent_ids
+        self.n_agents = self.env.n_agents
 
-    def obtain_samples(self, num_steps=None):
+        self.observations_n = self.vec_env.reset()
+        self.actions_n = np.array([
+            {a_id: self.env.action_space_n[a_id].sample() for a_id in self.agent_ids}
+            for _ in range(self.env_num)
+        ])
+        self._ready_env_ids = np.arange(self.env_num)
+        # self.car_num = car_num
+        self.path_builders = [PathBuilder(self.agent_ids) for _ in range(self.env_num)]
+
+    def obtain_samples(self, num_steps=None, pred_obs=False):
         paths = []
         total_steps = 0
         if num_steps is None:
             num_steps = self.num_steps
-        while total_steps < num_steps:
-            new_paths = rollout(
-                self.env,
-                self.eval_env,
-                self.policy_n,
-                self.policy_mapping_dict,
-                self.max_path_length,
-                no_terminal=self.no_terminal,
-                render=self.render,
-                render_kwargs=self.render_kwargs,
-            )
-            paths.extend(new_paths)
-            total_steps += sum([len(new_path) for new_path in new_paths])
-        return paths
+        finished_env_ids = []
+        env_finished_car_num = np.zeros(self.env_num)
 
-
-def option_rollout(
-    env,
-    eval_env,
-    policy_n: Dict,
-    policy_mapping_dict,
-    max_path_length,
-    no_terminal=False,
-    render=False,
-    render_kwargs={},
-):
-    agent_ids = env.agent_ids
-    n_agents = env.n_agents
-    env_num = len(eval_env)
-    path_builder = [PathBuilder(agent_ids) for _ in range(env_num)]
-
-    ready_env_ids = np.arange(env_num)
-    observations_n = eval_env.reset(ready_env_ids)
-
-    prev_options_n = {
-        a_id: np.ones((env_num, 1), dtype=np.float32)
-        * policy_n[policy_mapping_dict[a_id]].stochastic_policy.option_dim
-        for a_id in agent_ids
-    }
-
-    for _ in range(max_path_length):
-        actions_n = {}
-        options_n = {}
-        for agent_id in agent_ids:
-            policy_id = policy_mapping_dict[agent_id]
-            observation, prev_option = (
-                observations_n[agent_id],
-                prev_options_n[agent_id],
-            )
-            option = policy_n[policy_id].get_options(observation, prev_option)
-            action = policy_n[policy_id].get_actions(observation, option)
-            actions_n[agent_id], options_n[agent_id] = (
-                action,
-                option,
-            )
-        if render:
-            eval_env.render(**render_kwargs)
-
-        (
-            next_observations_n,
-            rewards_n,
-            terminals_n,
-            env_infos_n,
-        ) = eval_env.step(actions_n, ready_env_ids)
-        if no_terminal:
-            terminals_n = dict(
-                zip(
-                    agent_ids,
-                    [
-                        [False for _ in range(len(ready_env_ids))]
-                        for _ in range(n_agents)
-                    ],
-                )
+        while True:
+            self.actions_n[self._ready_env_ids] = self._get_action_and_info(
+                self.observations_n[self._ready_env_ids],
             )
 
-        for agent_id in agent_ids:
-            for idx, (
+            next_observations_n, rewards_n, terminals_n, env_infos_n = self.vec_env.step(
+                self.actions_n[self._ready_env_ids].copy(), id=self._ready_env_ids
+            )
+            self._ready_env_ids = np.array([i["env_id"] for i in env_infos_n])
+
+            for (
                 observation_n,
                 action_n,
                 reward_n,
                 next_observation_n,
                 terminal_n,
-                prev_option_n,
-                option_n,
                 env_info_n,
-            ) in enumerate(
-                zip(
-                    *map(
-                        dict_list_to_list_dict,
-                        [
-                            observations_n,
-                            actions_n,
-                            rewards_n,
-                            next_observations_n,
-                            terminals_n,
-                            prev_options_n,
-                            options_n,
-                            env_infos_n,
-                        ],
-                    )
-                )
+                env_id,
+            ) in zip(
+                self.observations_n[self._ready_env_ids],
+                self.actions_n[self._ready_env_ids],
+                rewards_n,
+                next_observations_n,
+                terminals_n,
+                env_infos_n,
+                self._ready_env_ids,
             ):
-                env_idx = ready_env_ids[idx]
-                path_builder[env_idx][agent_id].add_all(
-                    observations=observation_n[agent_id],
-                    actions=action_n[agent_id],
-                    rewards=np.array([reward_n[agent_id]]),
-                    next_observations=next_observation_n[agent_id],
-                    terminals=np.array([terminal_n[agent_id]]),
-                    prev_options=prev_options_n[agent_id],
-                    options=options_n[agent_id],
-                    env_infos=env_info_n[agent_id],
-                )
+                for a_id in self.agent_ids:
+                    self.path_builders[env_id][a_id].add_all(
+                        observations=observation_n[a_id],
+                        actions=action_n[a_id],
+                        rewards=reward_n[a_id],
+                        next_observations=next_observation_n[a_id],
+                        terminals=terminal_n[a_id],
+                        env_infos=env_info_n[a_id],
+                    )
 
-        terminals_all = np.ones_like(list(terminals_n.values())[0])
-        for terminals in terminals_n.values():
-            terminals_all = np.logical_and(terminals_all, terminals)
-        if np.any(terminals_all):
-            end_env_ids = ready_env_ids[np.where(terminals_all)[0]]
-            ready_env_ids = np.array(list(set(ready_env_ids) - set(end_env_ids)))
-            if len(ready_env_ids) == 0:
+            self.observations_n[self._ready_env_ids] = next_observations_n
+
+            terminals_all = [np.all(list(terminal.values())) for terminal in terminals_n]
+            for env_id, terminal in zip(self._ready_env_ids, terminals_all):
+                if terminal or len(self.path_builders[env_id]) >= self.max_path_length:
+                    paths.append(self.path_builders[env_id])
+                    total_steps += len(self.path_builders[env_id])
+                    self.path_builders[env_id] = PathBuilder(self.agent_ids)
+                    env_finished_car_num[env_id] += 1
+                    if not terminal or not self.vec_env.auto_reset:
+                        self.observations_n[env_id] = self.vec_env.reset(id=env_id)
+                    if env_finished_car_num[env_id] == self.car_num[env_id]:
+                        finished_env_ids.append(env_id)
+
+            self._ready_env_ids = np.array(
+                [x for x in self._ready_env_ids if x not in finished_env_ids]
+            )
+
+            if len(finished_env_ids) == self.env_num:
+                assert len(self._ready_env_ids) == 0
                 break
 
-        observations_n = {}
-        prev_options_n = {}
-        for agent_id in agent_ids:
-            observations_n[agent_id] = next_observations_n[agent_id][
-                np.where(terminals_all == False)
-            ]
-            prev_options_n[agent_id] = options_n[agent_id][
-                np.where(terminals_all == False)
-            ]
+        self._ready_env_ids = np.arange(self.env_num)
 
-    return path_builder
-
-
-class OptionPathSampler:
-    def __init__(
-        self,
-        env,
-        eval_env,
-        policy_n,
-        policy_mapping_dict,
-        num_steps,
-        max_path_length,
-        no_terminal=False,
-        render=False,
-        render_kwargs={},
-    ):
-        """
-        When obtain_samples is called, the path sampler will generates the
-        minimum number of rollouts such that at least num_steps timesteps
-        have been sampled
-        """
-        self.env = env
-        self.eval_env = eval_env
-        self.policy_n = policy_n
-        self.policy_mapping_dict = policy_mapping_dict
-        self.num_steps = num_steps
-        self.max_path_length = max_path_length
-        self.no_terminal = no_terminal
-        self.render = render
-        self.render_kwargs = render_kwargs
-
-    def obtain_samples(self, num_steps=None):
-        paths = []
-        total_steps = 0
-        if num_steps is None:
-            num_steps = self.num_steps
-        while total_steps < num_steps:
-            new_paths = option_rollout(
-                self.env,
-                self.eval_env,
-                self.policy_n,
-                self.policy_mapping_dict,
-                self.max_path_length,
-                no_terminal=self.no_terminal,
-                render=self.render,
-                render_kwargs=self.render_kwargs,
-            )
-            paths.extend(new_paths)
-            total_steps += sum([len(new_path) for new_path in new_paths])
         return paths
+
+    def _get_action_and_info(self, observations_n):
+        """
+        Get an action to take in the environment.
+        :param observation_n:
+        :return:
+        """
+        action_n = [{} for _ in range(len(observations_n))]
+        for agent_id in self.agent_ids:
+            policy_id = self.policy_mapping_dict[agent_id]
+            _observations = []
+            _idxes = []
+            for idx, observation_n in enumerate(observations_n):
+                if agent_id in observation_n:
+                    _observations.append(observation_n[agent_id])
+                    _idxes.append(idx)
+            _actions = self.policy_n[policy_id].get_actions(
+                np.stack(_observations, axis=0)
+            )
+            for idx, action in zip(_idxes, _actions):
+                action_n[idx][agent_id] = action
+        return action_n

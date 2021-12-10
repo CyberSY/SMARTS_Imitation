@@ -59,7 +59,6 @@ class AdvIRL(TorchBaseAlgorithm):
             "fairl",
             "gail2",
         ], "Invalid adversarial irl algorithm!"
-        # if kwargs['wrap_absorbing']: raise NotImplementedError()
         super().__init__(**kwargs)
 
         self.mode = mode
@@ -155,8 +154,6 @@ class AdvIRL(TorchBaseAlgorithm):
             keys.append("next_observations")
         else:
             keys.append("actions")
-        if self.wrap_absorbing:
-            keys.append("absorbing")
 
         expert_batch = self.get_batch(self.disc_optim_batch_size, agent_id, True, keys)
         policy_batch = self.get_batch(self.disc_optim_batch_size, agent_id, False, keys)
@@ -164,26 +161,10 @@ class AdvIRL(TorchBaseAlgorithm):
         expert_obs = expert_batch["observations"]
         policy_obs = policy_batch["observations"]
 
-        if self.wrap_absorbing:
-            # pass
-            expert_obs = torch.cat(
-                [expert_obs, expert_batch["absorbing"][:, 0:1]], dim=-1
-            )
-            policy_obs = torch.cat(
-                [policy_obs, policy_batch["absorbing"][:, 0:1]], dim=-1
-            )
-
         if self.state_only:
             expert_next_obs = expert_batch["next_observations"]
             policy_next_obs = policy_batch["next_observations"]
-            if self.wrap_absorbing:
-                # pass
-                expert_next_obs = torch.cat(
-                    [expert_next_obs, expert_batch["absorbing"][:, 1:]], dim=-1
-                )
-                policy_next_obs = torch.cat(
-                    [policy_next_obs, policy_batch["absorbing"][:, 1:]], dim=-1
-                )
+
             expert_disc_input = torch.cat([expert_obs, expert_next_obs], dim=1)
             policy_disc_input = torch.cat([policy_obs, policy_next_obs], dim=1)
         else:
@@ -283,11 +264,6 @@ class AdvIRL(TorchBaseAlgorithm):
         obs = policy_batch["observations"]
         acts = policy_batch["actions"]
         next_obs = policy_batch["next_observations"]
-
-        if self.wrap_absorbing:
-            # pass
-            obs = torch.cat([obs, policy_batch["absorbing"][:, 0:1]], dim=-1)
-            next_obs = torch.cat([next_obs, policy_batch["absorbing"][:, 1:]], dim=-1)
 
         self.discriminator_n[policy_id].eval()
         if self.state_only:

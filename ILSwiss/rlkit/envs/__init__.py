@@ -41,6 +41,9 @@ def get_envs(
     env_specs,
     env_wrapper=None,
     env_num=1,
+    wait_num=None,
+    auto_reset=False,
+    seed=None,
     **kwargs,
 ):
     """
@@ -69,19 +72,22 @@ def get_envs(
 
     if env_num == 1:
         envs = env_wrapper(env_class(**env_specs))
-
         print("\n WARNING: Single environment detected, wrap to DummyVectorEnv.")
         envs = DummyVectorEnv(
             [lambda: envs],
+            auto_reset=auto_reset,
             **kwargs,
         )
 
     else:
         envs = SubprocVectorEnv(
             [lambda: env_wrapper(env_class(**env_specs)) for _ in range(env_num)],
+            wait_num=wait_num,
+            auto_reset=auto_reset,
             **kwargs,
         )
 
+    envs.seed(seed)
     return envs
 
 

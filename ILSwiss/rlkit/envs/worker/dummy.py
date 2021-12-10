@@ -8,9 +8,9 @@ from rlkit.envs.worker import EnvWorker
 class DummyEnvWorker(EnvWorker):
     """Dummy worker used in sequential vector environments."""
 
-    def __init__(self, env_fn: Callable[[], gym.Env]) -> None:
+    def __init__(self, env_fn: Callable[[], gym.Env], auto_reset=False) -> None:
         self.env = env_fn()
-        super().__init__(env_fn)
+        super().__init__(env_fn, auto_reset=auto_reset)
 
     def __getattr__(self, key: str) -> Any:
         return getattr(self.env, key)
@@ -27,6 +27,8 @@ class DummyEnvWorker(EnvWorker):
 
     def send_action(self, action_n: Dict[str, np.ndarray]) -> None:
         self.result = self.env.step(action_n)
+        if all(list(self.result[2].values())) and self.auto_reset:
+            self.result[0] = self.env.reset()
 
     def seed(self, seed: Optional[int] = None) -> List[int]:
         super().seed(seed)

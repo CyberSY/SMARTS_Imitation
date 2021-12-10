@@ -75,8 +75,9 @@ def experiment(variant):
 
     for i in range(len(traj_list)):
         expert_replay_buffer.add_path(
-            traj_list[i], absorbing=variant["adv_irl_params"]["wrap_absorbing"], env=env
+            traj_list[i], env=env
         )
+
     print(
         "Load {} trajectories, {} samples".format(
             len(traj_list), expert_replay_buffer.num_steps_can_sample()
@@ -161,25 +162,22 @@ def experiment(variant):
             print(f"Use existing {policy_id} for {agent_id} ...")
 
     env_wrapper = ProxyEnv  # Identical wrapper
-    kwargs = {}
     for act_space in act_space_n.values():
         if isinstance(act_space, gym.spaces.Box):
             env_wrapper = NormalizedBoxActEnv
             break
 
-    env = env_wrapper(env, **kwargs)
+    env = env_wrapper(env)
 
-    print("Creating {} training environments ...".format(env_specs["training_env_num"]))
+    print("Creating {} training environments ...".format(env_specs["training_env_specs"]["env_num"]))
     training_env = get_envs(
-        env_specs, env_wrapper, env_num=env_specs["training_env_num"], **kwargs
+        env_specs, env_wrapper, **env_specs["training_env_specs"],
     )
-    training_env.seed(env_specs["training_env_seed"])
 
-    print("Creating {} evaluation environments ...".format(env_specs["eval_env_num"]))
+    print("Creating {} evaluation environments ...".format(env_specs["eval_env_specs"]["env_num"]))
     eval_env = get_envs(
-        env_specs, env_wrapper, env_num=env_specs["eval_env_num"], **kwargs
+        env_specs, env_wrapper, **env_specs["eval_env_specs"],
     )
-    eval_env.seed(env_specs["eval_env_seed"])
 
     algorithm = AdvIRL(
         env=env,
@@ -224,9 +222,6 @@ if __name__ == "__main__":
 
     if not exp_specs["adv_irl_params"]["no_terminal"]:
         exp_suffix = "--terminal" + exp_suffix
-
-    if exp_specs["adv_irl_params"]["wrap_absorbing"]:
-        exp_suffix = "--absorbing" + exp_suffix
 
     if exp_specs["scale_env_with_demo_stats"]:
         exp_suffix = "--scale" + exp_suffix

@@ -7,7 +7,6 @@ import argparse
 
 from smarts_imitation.utils import adapter
 from smarts_imitation.utils import agent
-from smarts.core.utils.math import radians_to_vec
 
 
 def acceleration_count(obs, obs_next, acc_dict, ang_v_dict, avg_dis_dict):
@@ -173,7 +172,7 @@ if __name__ == "__main__":
         "(see scenarios/ for some samples you can use) OR a directory of scenarios "
         "to sample from.",
         type=str,
-        default="/NAS2020/Workspaces/DRLGroup/zbzhu/SMARTS_Imitation/smarts-imitation/interaction_dataset/scenarios/interaction_dataset_merging",
+        default="/NAS2020/Workspaces/DRLGroup/zbzhu/MADPO/SMARTS_Imitation/smarts-imitation/ngsim",
     )
     args = parser.parse_args()
     main(

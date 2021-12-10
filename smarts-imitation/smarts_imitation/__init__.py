@@ -28,8 +28,8 @@ register(
     kwargs=dict(
         scenarios=[
             os.path.join(
-                os.path.dirname(__file__),
-                "../ngsim",
+                os.path.dirname(os.path.dirname(__file__)),
+                "ngsim",
             )
         ],
         action_range=np.array(

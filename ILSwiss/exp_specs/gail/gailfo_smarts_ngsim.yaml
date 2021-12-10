@@ -46,7 +46,6 @@ constants:
     expert_buffer_size: 1000000
     no_terminal: false
     eval_no_terminal: false
-    wrap_absorbing: false
 
     num_update_loops_per_train_call: 100
     num_disc_updates_per_loop_iter: 1
@@ -83,7 +82,13 @@ constants:
     env_creator: 'smarts'
     scenario_name: 'ngsim'
     env_kwargs: {}
-    training_env_num: 5
-    eval_env_num: 5
-    training_env_seed: 24491
-    eval_env_seed: 24492
+    training_env_specs:
+      env_num: 20
+      wait_num: 10
+      auto_reset: True
+      seed: 24491
+    eval_env_specs:
+      env_num: 10
+      wait_num: 5
+      auto_reset: True
+      seed: 24492

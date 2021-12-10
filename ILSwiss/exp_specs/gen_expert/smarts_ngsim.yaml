@@ -13,5 +13,5 @@ constants:
   env_specs:
     env_creator: "smarts"
     scenario_name: "ngsim"
-    scenario_path: "/NAS2020/Workspaces/DRLGroup/zbzhu/SMARTS_Imitation/smarts-imitation/ngsim"
+    scenario_path: "/NAS2020/Workspaces/DRLGroup/zbzhu/MADPO/SMARTS_Imitation/smarts-imitation/ngsim"
     env_kwargs: {}
