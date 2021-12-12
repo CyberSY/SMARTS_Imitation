@@ -25,7 +25,7 @@ from rlkit.torch.algorithms.sac.sac_alpha import (
 )  # SAC Auto alpha version
 from rlkit.torch.algorithms.adv_irl.disc_models.simple_disc_models import MLPDisc
 from rlkit.torch.algorithms.adv_irl.adv_irl import AdvIRL
-from rlkit.envs.wrappers import ProxyEnv, NormalizedBoxActEnv
+from rlkit.envs.wrappers import ProxyEnv, NormalizedBoxActEnv, ObsScaledEnv, EPS
 
 
 def experiment(variant):
@@ -72,17 +72,6 @@ def experiment(variant):
     )
 
     variant["adv_irl_params"].pop("expert_buffer_size")
-
-    for i in range(len(traj_list)):
-        expert_replay_buffer.add_path(
-            traj_list[i], env=env
-        )
-
-    print(
-        "Load {} trajectories, {} samples".format(
-            len(traj_list), expert_replay_buffer.num_steps_can_sample()
-        )
-    )
 
     obs_space_n = env.observation_space_n
     act_space_n = env.action_space_n
@@ -167,17 +156,58 @@ def experiment(variant):
             env_wrapper = NormalizedBoxActEnv
             break
 
+    if variant["scale_env_with_demo_stats"]:
+        obs = np.vstack([traj_list[i][k]["observations"] for i in range(len(traj_list)) for k in traj_list[i].keys()])
+        obs_mean, obs_std = np.mean(obs, axis=0), np.std(obs, axis=0)
+
+        _env_wrapper = env_wrapper
+        env_wrapper = lambda *args, **kwargs: ObsScaledEnv(
+            _env_wrapper(*args, **kwargs), obs_mean=obs_mean, obs_std=obs_std,
+        )
+        for i in range(len(traj_list)):
+            for k in traj_list[i].keys():
+                traj_list[i][k]["observations"] = (traj_list[i][k]["observations"] - obs_mean) / (obs_std + EPS)
+                traj_list[i][k]["next_observations"] = (traj_list[i][k]["next_observations"] - obs_mean) / (obs_std + EPS)
+
     env = env_wrapper(env)
 
-    print("Creating {} training environments ...".format(env_specs["training_env_specs"]["env_num"]))
-    training_env = get_envs(
-        env_specs, env_wrapper, **env_specs["training_env_specs"],
+    for i in range(len(traj_list)):
+        expert_replay_buffer.add_path(
+            traj_list[i], env=env
+        )
+
+    print(
+        "Load {} trajectories, {} samples".format(
+            len(traj_list), expert_replay_buffer.num_steps_can_sample()
+        )
     )
 
-    print("Creating {} evaluation environments ...".format(env_specs["eval_env_specs"]["env_num"]))
-    eval_env = get_envs(
-        env_specs, env_wrapper, **env_specs["eval_env_specs"],
+    train_split_path = listings[variant["expert_name"]]["train_split"][0]
+    with open(train_split_path, "rb") as f:
+        train_vehicle_ids = pickle.load(f)
+    train_vehicle_ids_list = np.array_split(
+        train_vehicle_ids,
+        env_specs["training_env_specs"]["env_num"],
     )
+
+    print("Creating {} training environments, each with {} vehicles ...".format(env_specs["training_env_specs"]["env_num"], len(train_vehicle_ids_list[0])))
+    training_env = get_envs(
+        env_specs, env_wrapper, vehicle_ids_list=train_vehicle_ids_list, **env_specs["training_env_specs"],
+    )
+
+    eval_split_path = listings[variant["expert_name"]]["eval_split"][0]
+    with open(eval_split_path, "rb") as f:
+        eval_vehicle_ids = pickle.load(f)
+    eval_vehicle_ids_list = np.array_split(
+        eval_vehicle_ids,
+        env_specs["eval_env_specs"]["env_num"],
+    )
+
+    print("Creating {} evaluation environments, each with {} vehicles ...".format(env_specs["eval_env_specs"]["env_num"], len(eval_vehicle_ids_list[0])))
+    eval_env = get_envs(
+        env_specs, env_wrapper, vehicle_ids_list=eval_vehicle_ids_list, **env_specs["eval_env_specs"],
+    )
+    eval_car_num = np.array([len(v_ids) for v_ids in eval_vehicle_ids_list])
 
     algorithm = AdvIRL(
         env=env,
@@ -188,6 +218,7 @@ def experiment(variant):
         discriminator_n=disc_model_n,
         policy_trainer_n=policy_trainer_n,
         expert_replay_buffer=expert_replay_buffer,
+        eval_car_num=eval_car_num,
         **variant["adv_irl_params"],
     )
 

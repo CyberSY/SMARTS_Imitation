@@ -7,6 +7,9 @@ class PathBuilder:
         self.n_agents = len(agent_ids)
         self.agent_path_builders = {a_id: AgentPathBuilder() for a_id in agent_ids}
 
+    def keys(self):
+        return self.agent_ids
+
     def __len__(self):
         return len(list(self.agent_path_builders.values())[0])
 

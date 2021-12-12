@@ -4,7 +4,7 @@ import numpy as np
 from gym.envs.registration import register
 
 register(
-    id="SMARTS-Imitation-v0",
+    id="Interaction-Imitation-v0",
     entry_point="smarts_imitation.envs:SMARTSImitation",
     kwargs=dict(
         scenarios=[

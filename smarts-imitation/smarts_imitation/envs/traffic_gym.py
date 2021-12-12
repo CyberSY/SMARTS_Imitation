@@ -10,7 +10,7 @@ from smarts_imitation.utils import agent
 
 
 class SMARTSImitation(gym.Env):
-    def __init__(self, scenarios, action_range):
+    def __init__(self, scenarios, action_range, vehicle_ids=None):
         super(SMARTSImitation, self).__init__()
         self.scenarios_iterator = Scenario.scenario_variations(scenarios, [])
         self._next_scenario()
@@ -22,6 +22,10 @@ class SMARTSImitation(gym.Env):
         self.action_space = gym.spaces.Box(
             low=np.array([-1.0, -1.0]), high=np.array([1.0, 1.0]), dtype=np.float64
         )
+        if vehicle_ids is not None:
+            self.vehicle_ids = vehicle_ids
+        else:
+            print("Use ALL vehicles")
 
         assert (
             action_range.shape == (2, 2) and (action_range[1] >= action_range[0]).all()
@@ -79,8 +83,10 @@ class SMARTSImitation(gym.Env):
         )
 
     def reset(self):
+        # if self.vehicle_itr >= len(self.vehicle_ids):
+        #     self._next_scenario()
         if self.vehicle_itr >= len(self.vehicle_ids):
-            self._next_scenario()
+            self.vehicle_itr = 0
 
         self.vehicle_id = self.vehicle_ids[self.vehicle_itr]
         vehicle_mission = self.vehicle_missions[self.vehicle_id]

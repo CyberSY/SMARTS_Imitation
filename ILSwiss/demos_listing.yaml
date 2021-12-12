@@ -7,5 +7,11 @@ smarts_interaction_dataset:
 smarts_ngsim:
   description: "NGSIM, SMARTS"
   file_paths: [
-    ./demos/smarts_ngsim.pkl
+    ./demos/ngsim/smarts_ngsim.pkl
+  ]
+  eval_split: [
+    ./demos/ngsim/test_ids.pkl
+  ]
+  train_split: [
+    ./demos/ngsim/train_ids.pkl
   ]

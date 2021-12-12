@@ -40,6 +40,7 @@ def get_env(env_specs):
 def get_envs(
     env_specs,
     env_wrapper=None,
+    vehicle_ids_list=None,
     env_num=1,
     wait_num=None,
     auto_reset=False,
@@ -71,17 +72,22 @@ def get_envs(
         raise NotImplementedError
 
     if env_num == 1:
-        envs = env_wrapper(env_class(**env_specs))
         print("\n WARNING: Single environment detected, wrap to DummyVectorEnv.")
         envs = DummyVectorEnv(
-            [lambda: envs],
+            [
+                lambda: env_wrapper(env_class(vehicle_ids=vehicle_ids_list[i], **env_specs))
+                for i in range(env_num)
+            ],
             auto_reset=auto_reset,
             **kwargs,
         )
 
     else:
         envs = SubprocVectorEnv(
-            [lambda: env_wrapper(env_class(**env_specs)) for _ in range(env_num)],
+            [
+                lambda: env_wrapper(env_class(vehicle_ids=vehicle_ids_list[i], **env_specs))
+                for i in range(env_num)
+            ],
             wait_num=wait_num,
             auto_reset=auto_reset,
             **kwargs,

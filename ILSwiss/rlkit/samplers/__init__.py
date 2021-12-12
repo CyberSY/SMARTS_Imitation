@@ -12,6 +12,7 @@ class PathSampler:
         policy_mapping_dict,
         num_steps,
         max_path_length,
+        car_num,
         no_terminal=False,
         render=False,
         render_kwargs={},
@@ -25,6 +26,7 @@ class PathSampler:
         self.vec_env = vec_env
         self.env_num = vec_env.env_num
         self.wait_num = vec_env.wait_num
+        self.car_num = car_num
         self.policy_n = policy_n
         self.policy_mapping_dict = policy_mapping_dict
         self.num_steps = num_steps
@@ -49,9 +51,9 @@ class PathSampler:
         total_steps = 0
         if num_steps is None:
             num_steps = self.num_steps
+
         finished_env_ids = []
         env_finished_car_num = np.zeros(self.env_num)
-
         while True:
             self.actions_n[self._ready_env_ids] = self._get_action_and_info(
                 self.observations_n[self._ready_env_ids],
