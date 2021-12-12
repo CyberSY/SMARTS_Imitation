@@ -5,9 +5,8 @@ The implementation of the vecenv is based on [tianshou](https://github.com/thu-m
 import gym
 from gym import Env
 import numpy as np
-from typing import Any, List, Tuple, Optional, Union, Callable, Dict
+from typing import Any, List, Optional, Union, Callable, Dict
 
-from rlkit.core import list_dict_to_dict_list
 from rlkit.envs.worker import EnvWorker, DummyEnvWorker, SubprocEnvWorker
 from rlkit.data_management.normalizer import RunningMeanStd
 
@@ -187,17 +186,6 @@ class BaseVectorEnv(Env):
             for a_id in obs.keys():
                 obs[a_id] = self.normalize_obs(obs[a_id], a_id)
         return np.stack(obs_list)
-        # for a_id in obs_dict.keys():
-        #     obs_dict[a_id] = self.normalize_obs(obs_dict[a_id], a_id)
-        # return dict(obs_dict)
-        # obs_dict = list_dict_to_dict_list(obs_list)  # dict of list
-        # for a_id in obs_dict.keys():
-            # try:
-            #     obs_dict[a_id] = np.stack(obs_dict[a_id])
-            # except ValueError:  # different len(obs)
-            #     obs_dict[a_id] = np.array(obs_dict[a_id], dtype=object)
-            # if self.obs_rms_n and self.update_obs_rms:
-            #     self.obs_rms_n[a_id].update(obs_dict[a_id])
 
     def step(
         self,
@@ -262,25 +250,6 @@ class BaseVectorEnv(Env):
                 result.append((obs, rew, done, info))
                 self.ready_id.append(env_id)
         return list(map(np.stack, zip(*result)))
-        # obs_list, rew_list, done_list, info_list = zip(*result)
-        # obs_dict, rew_dict, done_dict, info_dict = map(
-        #     list_dict_to_dict_list, [obs_list, rew_list, done_list, info_list]
-        # )
-        # for a_id in obs_dict.keys():
-        #     try:
-        #         obs_dict[a_id] = np.stack(obs_dict[a_id])
-        #     except ValueError:  # different len(obs)
-        #         obs_dict[a_id] = np.array(obs_dict[a_id], dtype=object)
-        #     rew_dict[a_id], done_dict[a_id], info_dict[a_id] = map(
-        #         np.stack, [rew_dict[a_id], done_dict[a_id], info_dict[a_id]]
-        #     )
-        #     if self.obs_rms_n and self.update_obs_rms:
-        #         self.obs_rms_n[a_id].update(obs_dict[a_id])
-        # # in case different agents share the same noramlizer, one should normlize obs
-        # # after all normalizers are updated.
-        # for a_id in obs_dict.keys():
-        #     obs_dict[a_id] = self.normalize_obs(obs_dict[a_id], a_id)
-        # return obs_dict, rew_dict, done_dict, info_dict
 
     def seed(
         self, seed: Optional[Union[int, List[int]]] = None

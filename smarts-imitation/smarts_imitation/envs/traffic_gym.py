@@ -83,8 +83,6 @@ class SMARTSImitation(gym.Env):
         )
 
     def reset(self):
-        # if self.vehicle_itr >= len(self.vehicle_ids):
-        #     self._next_scenario()
         if self.vehicle_itr >= len(self.vehicle_ids):
             self.vehicle_itr = 0
 

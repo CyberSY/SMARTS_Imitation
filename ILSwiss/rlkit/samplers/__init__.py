@@ -43,7 +43,6 @@ class PathSampler:
             for _ in range(self.env_num)
         ])
         self._ready_env_ids = np.arange(self.env_num)
-        # self.car_num = car_num
         self.path_builders = [PathBuilder(self.agent_ids) for _ in range(self.env_num)]
 
     def obtain_samples(self, num_steps=None, pred_obs=False):

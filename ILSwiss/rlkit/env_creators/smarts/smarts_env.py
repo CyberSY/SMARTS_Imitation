@@ -5,8 +5,6 @@ from rlkit.env_creators.base_env import BaseEnv
 
 
 class SmartsEnv(BaseEnv):
-    """A wrapper for gym Mujoco environments to fit in multi-agent apis."""
-
     def __init__(self, vehicle_ids=None, **configs):
         super().__init__(**configs)
 
