@@ -114,3 +114,56 @@ class NormalizedBoxActEnv(ProxyEnv, Serializable):
 
     def __getattr__(self, attrname):
         return getattr(self._wrapped_env, attrname)
+
+
+class ObsScaledEnv(ProxyEnv, Serializable):
+    """
+    Scale the obs if desired
+    Unscale the acts if desired
+    """
+
+    def __init__(
+        self,
+        env,
+        obs_mean,
+        obs_std,
+    ):
+        self._wrapped_env = env
+        self._serializable_initialized = False
+        Serializable.quick_init(self, locals())
+        ProxyEnv.__init__(self, env)
+
+        self.obs_mean = obs_mean
+        self.obs_std = obs_std
+
+    def __getstate__(self):
+        d = Serializable.__getstate__(self)
+        # Add these explicitly in case they were modified
+        return d
+
+    def __setstate__(self, d):
+        Serializable.__setstate__(self, d)
+
+    def get_unscaled_obs(self, obs):
+        if self._scale_obs:
+            return obs * (self.obs_std + EPS) + self.obs_mean
+        else:
+            return obs
+
+    def get_scaled_obs(self, obs):
+        if self._scale_obs:
+            return (obs - self.obs_mean) / (self.obs_std + EPS)
+        else:
+            return obs
+
+    def step(self, action_n):
+        observation_n, reward_n, done_n, info_n = self._wrapped_env.step(action_n)
+        for agent_id in observation_n.keys():
+            observation_n[agent_id] = (observation_n[agent_id] - self.obs_mean) / (self.obs_std + EPS)
+        return observation_n, reward_n, done_n, info_n
+
+    def reset(self, **kwargs):
+        observation_n = self._wrapped_env.reset(**kwargs)
+        for agent_id in observation_n.keys():
+            observation_n[agent_id] = (observation_n[agent_id] - self.obs_mean) / (self.obs_std + EPS)
+        return observation_n

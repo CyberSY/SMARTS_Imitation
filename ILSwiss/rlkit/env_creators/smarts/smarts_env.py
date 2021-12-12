@@ -5,18 +5,16 @@ from rlkit.env_creators.base_env import BaseEnv
 
 
 class SmartsEnv(BaseEnv):
-    """A wrapper for gym Mujoco environments to fit in multi-agent apis."""
-
-    def __init__(self, **configs):
+    def __init__(self, vehicle_ids=None, **configs):
         super().__init__(**configs)
 
         # create underlying smarts simulator
         scenario_name = configs["scenario_name"]
         env_kwargs = configs["env_kwargs"]
         if scenario_name == "interaction_dataset":
-            self._env = gym.make("SMARTS-Imitation-v0", **env_kwargs)
+            self._env = gym.make("SMARTS-Imitation-v0", vehicle_ids=vehicle_ids, **env_kwargs)
         elif scenario_name == "ngsim":
-            self._env = gym.make("SMARTS-Imitation-v1", **env_kwargs)
+            self._env = gym.make("SMARTS-Imitation-v1", vehicle_ids=vehicle_ids, **env_kwargs)
         else:
             raise NotImplementedError
 

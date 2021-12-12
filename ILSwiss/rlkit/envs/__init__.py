@@ -40,7 +40,11 @@ def get_env(env_specs):
 def get_envs(
     env_specs,
     env_wrapper=None,
+    vehicle_ids_list=None,
     env_num=1,
+    wait_num=None,
+    auto_reset=False,
+    seed=None,
     **kwargs,
 ):
     """
@@ -68,40 +72,29 @@ def get_envs(
         raise NotImplementedError
 
     if env_num == 1:
-        envs = env_wrapper(env_class(**env_specs))
-
         print("\n WARNING: Single environment detected, wrap to DummyVectorEnv.")
         envs = DummyVectorEnv(
-            [lambda: envs],
+            [
+                lambda i=i: env_wrapper(env_class(vehicle_ids=vehicle_ids_list[i], **env_specs))
+                for i in range(env_num)
+            ],
+            auto_reset=auto_reset,
             **kwargs,
         )
 
     else:
         envs = SubprocVectorEnv(
-            [lambda: env_wrapper(env_class(**env_specs)) for _ in range(env_num)],
+            [
+                lambda i=i: env_wrapper(env_class(vehicle_ids=vehicle_ids_list[i], **env_specs))
+                for i in range(env_num)
+            ],
+            wait_num=wait_num,
+            auto_reset=auto_reset,
             **kwargs,
         )
 
+    envs.seed(seed)
     return envs
-
-
-# def get_task_params_samplers(task_specs):
-#     """
-#     task_specs:
-#         meta_train_tasks: 'hc_rand_vel_meta_train'
-#         meta_val_tasks: 'hc_rand_vel_meta_val'
-#         meta_test_tasks: 'hc_rand_vel_meta_test'
-#         meta_train_kwargs: {}
-#         meta_val_kwargs: {}
-#         meta_test_kwargs: {}
-#     """
-#     keys = ["meta_train_tasks", "meta_val_tasks", "meta_test_tasks"]
-#     d = {}
-#     for k in keys:
-#         if k in task_specs:
-#             task_class = load(task_specs[k])
-#             d[k] = task_class(**task_specs[k + "_kwargs"])
-#     return d
 
 
 class EnvFactory(metaclass=abc.ABCMeta):

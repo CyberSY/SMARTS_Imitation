@@ -7,11 +7,12 @@ from typing import Any, List, Tuple, Optional, Callable
 class EnvWorker(ABC):
     """An abstract worker for an environment."""
 
-    def __init__(self, env_fn: Callable[[], gym.Env]) -> None:
+    def __init__(self, env_fn: Callable[[], gym.Env], auto_reset=False) -> None:
         self._env_fn = env_fn
         self.is_closed = False
         self.result: Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]
         self.action_space_n = getattr(self, "action_space_n")
+        self.auto_reset = auto_reset
 
     @abstractmethod
     def __getattr__(self, key: str) -> Any:
