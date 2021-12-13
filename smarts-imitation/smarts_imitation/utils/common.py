@@ -27,6 +27,8 @@ import cv2
 import numpy as np
 import copy
 
+import pdb
+
 from typing import Dict
 from collections import namedtuple
 
@@ -172,9 +174,13 @@ class CalObs:
             else:
                 v = v[0]
 
-            pos = v.position[:2]
+            # pdb.set_trace()
+            pos = [v.position[0] - ego.position[0],v.position[1] - ego.position[1]]
+            speed = np.asarray(v.speed - ego.speed)
+            # pos = v.position[:2]
+            # speed = np.asarray(v.speed)
             heading = np.asarray(float(v.heading))
-            speed = np.asarray(v.speed)
+            
 
             features[i, :] = np.asarray(
                 [pos[0], pos[1], heading, speed]

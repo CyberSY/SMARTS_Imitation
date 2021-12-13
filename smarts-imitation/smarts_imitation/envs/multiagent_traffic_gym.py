@@ -11,8 +11,9 @@ from dataclasses import replace
 
 
 class MASMARTSImitation(gym.Env):
-    def __init__(self, scenarios, action_range, agent_number):
+    def __init__(self, scenarios, action_range, agent_number,mode="train"):
         super(MASMARTSImitation, self).__init__()
+        self.mode = mode
         self.scenarios_iterator = Scenario.scenario_variations(scenarios, [])
         self._next_scenario()
         self.obs_stacked_size = 1
@@ -160,6 +161,11 @@ class MASMARTSImitation(gym.Env):
         for id in range(len(self.vehicle_ids)):
             self.vehicle_ids[id] = f'{vlist[id][0]}'
         # np.random.shuffle(self.vehicle_ids)
+        train_num = round(len(self.vehicle_ids) * 0.8)
+        if self.mode == "train":
+            self.vehicle_ids = self.vehicle_ids[:train_num]
+        elif self.mode == "eval":
+            self.vehicle_ids = self.vehicle_ids[train_num:]
         self.vehicle_itr = 0
         self.n_agents_max = len(self.vehicle_ids)
 
