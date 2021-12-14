@@ -6,6 +6,7 @@ from typing import Dict, List
 import gtimer as gt
 import numpy as np
 from tqdm import tqdm
+import pdb
 
 from rlkit.core import logger, eval_util, dict_list_to_list_dict
 from rlkit.data_management.env_replay_buffer import EnvReplayBuffer
@@ -219,13 +220,14 @@ class BaseAlgorithm(metaclass=abc.ABCMeta):
                     self.actions_n[self._ready_env_ids],
                     rewards_n,
                     next_obs_n,
+
                     terminals_n,
                     env_ids=self._ready_env_ids,
                     env_infos_n=env_infos_n,
                 )
 
                 terminals_all = [np.all(list(terminal.values())) for terminal in terminals_n]
-
+                
                 self.observations_n[self._ready_env_ids] = next_obs_n
 
                 if np.any(terminals_all):

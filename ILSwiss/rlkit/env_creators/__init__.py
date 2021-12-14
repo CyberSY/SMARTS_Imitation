@@ -3,3 +3,4 @@ from rlkit.env_creators.mujoco.mujoco_env import MujocoEnv
 from rlkit.env_creators.mpe.mpe_env import MpeEnv
 from rlkit.env_creators.gym.gym_env import GymEnv
 from rlkit.env_creators.smarts.smarts_env import SmartsEnv
+from rlkit.env_creators.masmarts.masmarts_env import MASmartsEnv

@@ -15,3 +15,15 @@ smarts_ngsim:
   train_split: [
     ./demos/ngsim/train_ids.pkl
   ]
+
+masmarts_ngsim:
+  description: "NGSIM, MA-SMARTS"
+  file_paths: [
+    ./demos/ngsim/smarts_ngsim.pkl
+  ]
+  eval_split: [
+    ./demos/ngsim/multiagent_test_ids.pkl
+  ]
+  train_split: [
+    ./demos/ngsim/multiagent_train_ids.pkl
+  ]

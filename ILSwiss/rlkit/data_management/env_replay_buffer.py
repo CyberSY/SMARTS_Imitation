@@ -5,6 +5,62 @@ from rlkit.data_management.simple_replay_buffer import (
 )
 from gym.spaces import Box, Discrete, Tuple, Dict
 
+class PolicyReplayBuffer:
+    def __init__(self, max_replay_buffer_size, env, random_seed=1995):
+        self._observation_space_n = env.observation_space_n
+        self._action_space_n = env.action_space_n
+        self._default_agent_name = env.default_agent_name
+
+        self.policy_buffer = AgentEnvReplayBuffer(
+            max_replay_buffer_size,
+            self._observation_space_n[self._default_agent_name],
+            self._action_space_n[self._default_agent_name],
+            )
+
+        self._max_replay_buffer_size = max_replay_buffer_size
+
+    def num_steps_can_sample(self):
+        return self.policy_buffer.num_steps_can_sample()
+
+    def random_batch(self, batch_size: int, keys):
+        return self.policy_buffer.random_batch(batch_size, keys)
+
+    def terminate_episode(self):
+        self.policy_buffer.terminate_episode()
+
+    def sample_all_trajs(self):
+        return self.policy_buffer.sample_add_trajs()
+
+    def clear(self):
+        self.policy_buffer.clear()
+
+    def add_path(self, path_n, absorbing=False, env=None):
+        for a_id in path_n.keys():
+            self.policy_buffer.add_path(
+                path_n[a_id], absorbing=absorbing, env=env
+            )
+
+    def add_sample(
+        self,
+        observation_n,
+        action_n,
+        reward_n,
+        terminal_n,
+        next_observation_n,
+        **kwargs,
+    ):
+        for a_id in observation_n.keys():
+            if a_id not in next_observation_n.keys():
+                continue
+            self.policy_buffer.add_sample(
+                observation_n[a_id],
+                action_n[a_id],
+                reward_n[a_id],
+                terminal_n[a_id],
+                next_observation_n[a_id],
+                **{k: v[a_id] if isinstance(v, dict) else v for k, v in kwargs.items()},
+            )
+
 
 class EnvReplayBuffer:
     def __init__(self, max_replay_buffer_size, env, random_seed=1995):

@@ -81,8 +81,8 @@ constants:
     scenario_name: 'ngsim'
     env_kwargs: {}
     training_env_specs:
-      env_num: 30
-      wait_num: 15
+      env_num: 2
+      wait_num: 1
       auto_reset: True
       seed: 24491
     eval_env_specs:

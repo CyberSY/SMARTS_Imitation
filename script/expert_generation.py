@@ -172,7 +172,7 @@ if __name__ == "__main__":
         "(see scenarios/ for some samples you can use) OR a directory of scenarios "
         "to sample from.",
         type=str,
-        default="/NAS2020/Workspaces/DRLGroup/zbzhu/MADPO/SMARTS_Imitation/smarts-imitation/ngsim",
+        default="/NAS2020/Workspaces/DRLGroup/syzhang/SMARTS_Imitation/smarts-imitation/ngsim",
     )
     args = parser.parse_args()
     main(
